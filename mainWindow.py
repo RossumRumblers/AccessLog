@@ -5,7 +5,9 @@
 # Created by: PyQt5 UI code generator 5.7
 #
 #
+import re
 import sheetReporter
+from dependencies import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -14,11 +16,14 @@ class Ui_MainWindow(object):
     def __init__(self):
         self.setupUi(self)
     
+    ###TODO###
+    # modify textbox at bottom with relevant info
     def _buttonPushed(self):
         IDnum = self.lineEdit.text()
         self.lineEdit.setText("")
-        IDnum = extractID(IDnum, "\d{10}"):
-        if IDnum:
+        p = re.compile("\d{10}")
+        match = re.search(p, IDnum)
+        if match:
             sheetReporter.Reporter().log(IDnum)
             
 
@@ -48,7 +53,6 @@ class Ui_MainWindow(object):
         self.textEdit.setAcceptRichText(False)
         self.textEdit.setCursorWidth(1)
         self.textEdit.setObjectName("textEdit")
-        self.textEdit.returnPressed.connect(self.pushButton.click)
         self.widget = QtWidgets.QWidget(self.centralwidget)
         self.widget.setGeometry(QtCore.QRect(215, 70, 161, 61))
         self.widget.setObjectName("widget")
@@ -63,7 +67,6 @@ class Ui_MainWindow(object):
         self.pushButton = QtWidgets.QPushButton(self.widget)
         self.pushButton.setGeometry(QtCore.QRect(110, 30, 51, 20))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(self._buttonPushed)
         self.label_3 = QtWidgets.QLabel(self.widget)
         self.label_3.setGeometry(QtCore.QRect(0, 10, 160, 20))
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
@@ -75,6 +78,8 @@ class Ui_MainWindow(object):
         self.label_2.setIndent(-1)
         self.label_2.setObjectName("label_2")
         #MainWindow.setCentralWidget(self.centralwidget)
+        self.lineEdit.returnPressed.connect(self.pushButton.click)
+        self.pushButton.clicked.connect(self._buttonPushed)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)

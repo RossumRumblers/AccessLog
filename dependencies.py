@@ -3,6 +3,9 @@
 # the functions include those form the API and pyevdev
 #
 
+###TODO###
+# DocStrings
+
 import os
 import re
 import sys
@@ -174,7 +177,6 @@ def initReader(vid, pid):
 #
 def readData(reader):
     keyEvents = []
-    reader.grab()
     for event in reader.read_loop():
         if event.type == evdev.ecodes.EV_KEY:
             temp = evdev.categorize(event)
@@ -182,7 +184,6 @@ def readData(reader):
                 keyEvents.append(temp)
                 if keyEvents[-1].keycode == "KEY_KPENTER":
                     break
-    reader.ungrab()
     return keyEvents[:-1]
 
 #
