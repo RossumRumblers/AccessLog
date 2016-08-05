@@ -98,3 +98,6 @@ ENV/
 
 # Google API Clients Secrets Files
 secrets/
+
+# Visual Studio code Project Directory
+.vscode/
