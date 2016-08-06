@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>590</width>
-    <height>270</height>
+    <height>155</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>590</width>
-    <height>270</height>
+    <height>155</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>590</width>
-    <height>270</height>
+    <height>155</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -34,13 +34,34 @@
   <property name="windowTitle">
    <string>Rossum Rumblers Log App</string>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>590</width>
+     <height>155</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>590</width>
+     <height>155</height>
+    </size>
+   </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>195</x>
       <y>20</y>
-      <width>570</width>
+      <width>200</width>
       <height>20</height>
      </rect>
     </property>
@@ -53,35 +74,16 @@
      <string>Please Scan your ASU ID Card</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>570</width>
-      <height>110</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="acceptRichText">
-     <bool>false</bool>
-    </property>
-    <property name="cursorWidth">
-     <number>1</number>
+     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
     </property>
    </widget>
    <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>215</x>
+      <x>210</x>
       <y>70</y>
-      <width>161</width>
-      <height>61</height>
+      <width>170</width>
+      <height>60</height>
      </rect>
     </property>
     <widget class="QLineEdit" name="lineEdit">
@@ -90,7 +92,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>5</x>
        <y>30</y>
        <width>100</width>
        <height>20</height>
@@ -112,7 +114,7 @@
     <widget class="QPushButton" name="pushButton">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>115</x>
        <y>30</y>
        <width>51</width>
        <height>20</height>
@@ -125,9 +127,9 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>10</y>
-       <width>160</width>
+       <width>130</width>
        <height>20</height>
       </rect>
      </property>
@@ -145,9 +147,9 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>275</x>
       <y>50</y>
-      <width>581</width>
+      <width>40</width>
       <height>20</height>
      </rect>
     </property>
@@ -161,6 +163,26 @@
      <number>-1</number>
     </property>
    </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>590</width>
+     <height>155</height>
+    </size>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::NoContextMenu</enum>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
   </widget>
  </widget>
  <resources/>
