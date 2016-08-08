@@ -4,7 +4,7 @@ import worker
 import mainWindow
 import sheetReporter
 from dependencies import *
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow
 
 
@@ -21,8 +21,8 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         self.obj = worker.Worker()                         # instatiate worker object
         self.wThread = QThread()                           # instatiate worker thread
         self.obj.moveToThread(self.wThread)                # move the worker object into the worker thread
-        self.obj.update.connect(self.onUpdate)             # connect the update emitter to the onUpdate function
-        self.obj.finished.connect(self.onfinished)         # connect the finished emitter to the kill thread function
+        self.obj.update.connect(self.W_onUpdate)             # connect the update emitter to the onUpdate function
+        self.obj.finished.connect(self.W_onfinished)         # connect the finished emitter to the kill thread function
         self.wThread.started.connect(self.obj.USBworker)   # on thread start run the USBworker function
         self.wThread.start()                               # start the worker thread
 
@@ -31,28 +31,25 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
         self.show()
 
-    ###TODO###
-    # update statusbar with status message
-    def onUpdate(self):
-        pass
+    def W_onUpdate(self, string, time):
+        self.updateStatus(string, time)
 
-    def onfinished(self):
+    def W_onfinished(self):
         self.wThread.quit()
         self.obj.USBworkerfinish()
-        
-    ###TODO###
-    # update statusbar with status message
+
     def buttonPushed(self):
-        self.statusBar.showMessage("LOL")
+        self.updateStatus("Logging...", 0)
         IDnum = self.lineEdit.text()
         self.lineEdit.setText("")
         p = re.compile("\d{10}")
         match = re.search(p, IDnum)
         if match:
-            sheetReporter.Reporter().log(IDnum)
+            self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
             
-    def updateStatus(self, string):
-        self.statusBar.showMessage(string)
+    def updateStatus(self, message, time):
+        # time is in seconds
+        self.statusBar.showMessage(message, time*1000)
   
 
 ###TODO###
@@ -61,5 +58,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = Form()
     print(app.exec_())
-    form.onfinished()
+    form.W_onfinished()
     sys.exit()

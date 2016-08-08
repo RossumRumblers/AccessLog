@@ -52,47 +52,54 @@ class Reporter(metaclass=Singleton):
     def __init__(self):
         self._service = createAPIService(getCredentials(_CRED_File, _secret_FileName, 
                                     _scopes, _applicationName, False), _discoveryUrl)
+
     ###TODO###
     # comments
-    # return values(names? bools? maybe a list)
+
+
+    ###FEATURE###
+    # Open google form for unregistered users
     #
+    #  Josh mentions wanting unregistered users have a google form pop up to register
+    #  Google does not allow custom redirects(to close the browser window afterwards)
+    # 
+    #1 check form for user completed(probably need to have either a timeout or check active processes or something...)
+    #2 look for QT browser window to see if i have greater control over it.(doubtful)
     def log(self, IDnum):
         try:
             searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
-            nextCell = len(searchList) + 2
-
+            self.nextCell = len(searchList) + 2
             lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
             if datetime.today().day != lastDate.day:
-                nextCell +=1
+                self.nextCell +=1
         except(NoValueReturnedError):
-            nextCell = 2
-
+            self.nextCell = 2
 
         IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
         clockedtime = strftime(_dateFormat) 
         userRow = None
         for cell in range(len(IDlist)):
-            print(IDlist[cell][0])
             if IDlist[cell][0] == IDnum:
                 userRow = cell+_IDColumnOffset
                 break;
         if not userRow:
-            print("User is not a member. Logging...")
             updateRange(self._service, PasteSpreadsheet, 
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[0],nextCell), [[clockedtime]], "RAW")
+                        "{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
             updateRange(self._service, PasteSpreadsheet,
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[1],nextCell), [[IDnum]], "USER_ENTERED")
+                        "{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
             updateRange(self._service, PasteSpreadsheet, 
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[2],nextCell), [["Unregistered"]], "USER_ENTERED")
+                        "{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
+            self.nextCell +=1
+            return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
         else:        
             rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
             result = requestRange(self._service, CopySpreadsheet, rangeRequest)
-            #print("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
-            rangeUpdate = "B{0}:{0}".format(nextCell)
-            updateRange(self._service, PasteSpreadsheet, rangeUpdate, result, "USER_ENTERED")
-            rangeUpdate = "A{0}:A{0}".format(nextCell)
-            updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]], "RAW")
-        nextCell +=1
+            rangeUpdate = "B{0}:{0}".format(self.nextCell)
+            updateRange(self._service, PasteSpreadsheet, rangeUpdate, result)
+            rangeUpdate = "A{0}:A{0}".format(self.nextCell)
+            updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]])
+            self.nextCell +=1
+            return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
 
 if __name__ == '__main__':
     pass

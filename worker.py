@@ -17,7 +17,7 @@ device_IDs = ["5131","2007"]
 class Worker(QObject):
     # create emitters
     finished = pyqtSignal()
-    update = pyqtSignal()
+    update = pyqtSignal(str,int)
     readerDevice = initReader(device_IDs[0], device_IDs[1])
 
     @pyqtSlot()
@@ -29,15 +29,14 @@ class Worker(QObject):
             # retrieve data from card scanner
             print("scanning")
             IDdata = interpretEvents(readData(self.readerDevice))
+            self.update.emit("Logging...",0)
             IDnum = extractID(IDdata, IDregex)
             if not IDnum:
                 continue
             #report ID
-            sheetReporter.Reporter().log(IDnum)
+            self.update.emit(sheetReporter.Reporter().log(IDnum), 3)
             #ensure the ID isnt double logged
             IDnum = None
-
-            self.update.emit()
         self.readerDevice.ungrab()
         self.finished.emit()
 
