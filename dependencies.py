@@ -105,14 +105,11 @@ def requestRanges(service, SpreadsheetId, ranges):
             result.append(elem.get('values', []))
         return result
 
-def updateRange(service, SpreadsheetId, range, sheetData, inputType):
+def updateRange(service, SpreadsheetId, range, sheetData):
     requestBody = {'values': sheetData}
-    if inputType in ['RAW', 'USER_ENTERED']:
-        returnedRange = service.spreadsheets().values().update(spreadsheetId=SpreadsheetId, range=range, body=requestBody, valueInputOption=inputType).execute()
-        if not returnedRange:
-            raise RangeNotUpdatedError(valueRange)
-    else:
-        raise InvalidInputTypeError(ranges)
+    returnedRange = service.spreadsheets().values().update(spreadsheetId=SpreadsheetId, range=range, body=requestBody, valueInputOption="USER_ENTERED").execute()
+    if not returnedRange:
+        raise RangeNotUpdatedError(valueRange)
     return returnedRange
 
 def updateRanges(service, SpreadsheetId, JSONrequest):
