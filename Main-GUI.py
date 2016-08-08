@@ -5,7 +5,7 @@ import mainWindow
 import sheetReporter
 from dependencies import *
 from PyQt5.QtCore import QThread, Qt
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget
 
 
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
@@ -13,6 +13,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
     def __init__(self, parent=None):
         QMainWindow.__init__(self)
         self.setupUi(self)
+        self.postSetup()
         sheetReporter.Reporter() # init Google API
 
         #
@@ -30,6 +31,13 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         self.pushButton.clicked.connect(self.buttonPushed)
 
         self.show()
+
+        
+    def postSetup(self):
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        frameGeo = self.frameGeometry()
+        frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
+        self.move(frameGeo.topLeft())
 
     def W_onUpdate(self, string, time):
         self.updateStatus(string, time)
