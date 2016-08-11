@@ -2,7 +2,7 @@ import time
 import evdev
 import mainWindow
 import sheetReporter
-from dependencies import *
+from dependencies.USBFunc import *
 from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot
 
 #regular expression for identifying ASU Student ID's

@@ -3,7 +3,7 @@
 #
 
 import os
-from dependencies import *
+from dependencies.GAPIFunc import *
 from time import strftime
 from datetime import datetime
 

@@ -3,7 +3,6 @@ import sys
 import worker
 import mainWindow
 import sheetReporter
-from dependencies import *
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget
 
