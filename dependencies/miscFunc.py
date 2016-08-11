@@ -19,7 +19,7 @@ def testRoot():
 # Check Internet Connection
 #
 def testInternet():
-    conn = httplib2.HTTPConnection("www.google.com")
+    conn = httplib2.HTTPConnectionWithTimeout("www.google.com",timeout=None)
     try:
         conn.request("HEAD", "/")
         return True
