@@ -19,8 +19,11 @@ _applicationName = "Lab Access Recorder Script"
 #
 # File name and Path Declarations
 #
-_secret_FileName = "client_secret-RR.json"
-_CRED_FileName = "cred-store-RR.json"
+_SECRET_FileName = "client_secret-RR.json"
+_SECRET_FilePath = os.path.join(os.path.curdir, "secrets")
+_SECRET_File = os.path.join(_SECRET_FilePath, _SECRET_FileName)
+
+_CRED_FileName = "cred_store-RR.json"
 _CRED_FilePath = os.path.join(os.path.expanduser("~"), ".cred")
 os.makedirs(_CRED_FilePath, exist_ok=True);
 _CRED_File = os.path.join(_CRED_FilePath, _CRED_FileName)
@@ -50,7 +53,7 @@ class Singleton(type):
 #define usage class for sheetreporter
 class Reporter(metaclass=Singleton):
     def __init__(self):
-        self._service = createAPIService(getCredentials(_CRED_File, _secret_FileName, 
+        self._service = createAPIService(getCredentials(_CRED_File, _SECRET_File, 
                                     _scopes, _applicationName, False), _discoveryUrl)
 
     ###TODO###
