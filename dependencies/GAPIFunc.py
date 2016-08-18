@@ -38,13 +38,13 @@ class RangeNotUpdatedError(Exception):
 #
 # Retrieve Access Ceredentials
 #
-def getCredentials(CRED_File, Secret_FileName, Scopes, APPLICATION_NAME, rebuild):
+def getCredentials(CRED_File, Secret_File, Scopes, APPLICATION_NAME, rebuild):
     # Attempt to retreieve credentials from file
     store = oauth2client.file.Storage(CRED_File)
     credentials = store.get()
     if not credentials or credentials.invalid or rebuild:
         # Get Credentials from server using Client keys
-        flow = client.flow_from_clientsecrets(Secret_FileName, Scopes)
+        flow = client.flow_from_clientsecrets(Secret_File, Scopes)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing credentials to ' + CRED_File)

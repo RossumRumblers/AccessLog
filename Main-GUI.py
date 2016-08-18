@@ -46,13 +46,16 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         self.obj.USBworkerfinish()
 
     def buttonPushed(self):
-        self.updateStatus("Logging...", 0)
         IDnum = self.lineEdit.text()
-        self.lineEdit.setText("")
-        p = re.compile("\d{10}")
-        match = re.search(p, IDnum)
-        if match:
-            self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
+        if(IDnum == ""):
+            self.updateStatus("Please Enter an ASU ID", 3)
+        else:
+            self.updateStatus("Logging...", 0)
+            self.lineEdit.setText("")
+            p = re.compile("\d{10}")
+            match = re.search(p, IDnum)
+            if match:
+                self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
             
     def updateStatus(self, message, time):
         # time is in seconds

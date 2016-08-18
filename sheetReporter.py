@@ -20,14 +20,18 @@ _applicationName = "Lab Access Recorder Script"
 # File name and Path Declarations
 #
 _SECRET_FileName = "client_secret-RR.json"
-_SECRET_FilePath = os.path.join(os.path.curdir, "secrets")
-_SECRET_File = os.path.join(_SECRET_FilePath, _SECRET_FileName)
-
 _CRED_FileName = "cred_store-RR.json"
-_CRED_FilePath = os.path.join(os.path.expanduser("~"), ".cred")
-os.makedirs(_CRED_FilePath, exist_ok=True);
-_CRED_File = os.path.join(_CRED_FilePath, _CRED_FileName)
+_Folder = ".cred"
 
+def _fileSetup():
+    #API Secrets file is in ~/.cred/secrets
+    #API access file is in ~/.cred
+    folderPath = os.path.join(os.path.expanduser('~'), _Folder)
+    os.makedirs(folderPath, exist_ok=True)
+    _SECRET_File = os.path.join(folderPath, _SECRET_FileName)
+    _CRED_File = os.path.join(folderPath, _CRED_FileName)
+    return [_SECRET_File, _CRED_File]
+    
 #
 # Column Declarations
 #
@@ -38,7 +42,7 @@ _RrelevantInfo = ['B', 'I']
 _URelevantInfo = ['A', 'D', 'G']
 
 #
-# Miscellaneous 
+# Miscellaneous Declarations
 #
 _dateFormat = "%Y-%m-%d %H:%M:%S"
 
@@ -53,21 +57,14 @@ class Singleton(type):
 #define usage class for sheetreporter
 class Reporter(metaclass=Singleton):
     def __init__(self):
-        self._service = createAPIService(getCredentials(_CRED_File, _SECRET_File, 
+        credFiles = _fileSetup()
+        print(credFiles[0])
+        print(credFiles[1])
+        self._service = createAPIService(getCredentials(credFiles[1], credFiles[0], 
                                     _scopes, _applicationName, False), _discoveryUrl)
 
     ###TODO###
     # comments
-
-
-    ###FEATURE###
-    # Open google form for unregistered users
-    #
-    #  Josh mentions wanting unregistered users have a google form pop up to register
-    #  Google does not allow custom redirects(to close the browser window afterwards)
-    # 
-    #1 check form for user completed(probably need to have either a timeout or check active processes or something...)
-    #2 look for QT browser window to see if i have greater control over it.(doubtful)
     def log(self, IDnum):
         try:
             searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
@@ -105,4 +102,4 @@ class Reporter(metaclass=Singleton):
             return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
 
 if __name__ == '__main__':
-    pass
+    _fileSetup()
