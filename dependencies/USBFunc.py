@@ -15,8 +15,10 @@ def initReader(vid, pid):
     for device in devices:
         if str(hex(device.info.vendor)[2:]) == vid:
             if str(hex(device.info.product)[2:]) == pid:
-                print("USB Device{0}:{1} not found".format(vid, pid))
+                print("USB Device {0}:{1} found".format(vid, pid))
                 reader = device
+            else:
+                print("USB Device {0}:{1} not found".format(vid, pid))
     return reader
 
 #
