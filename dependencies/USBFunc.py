@@ -10,11 +10,12 @@ import evdev
 def initReader(vid, pid):
     devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
     if not devices:
-        print("No devices found, please try re-running the script as root.")
+        print("No devices found.")
     reader = None
     for device in devices:
         if str(hex(device.info.vendor)[2:]) == vid:
             if str(hex(device.info.product)[2:]) == pid:
+                print("USB Device{0}:{1} not found".format(vid, pid))
                 reader = device
     return reader
 

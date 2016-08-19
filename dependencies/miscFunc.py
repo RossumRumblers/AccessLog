@@ -4,6 +4,7 @@
 
 import os
 import httplib2
+import subprocess
 
 #
 # Test Root Access

@@ -3,6 +3,7 @@ import sys
 import worker
 import mainWindow
 import sheetReporter
+from dependencies.miscFunc import *
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget
 
@@ -65,8 +66,12 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 ###TODO###
 # test root before runnning
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    form = Form()
-    print(app.exec_())
-    form.W_onfinished()
-    sys.exit()
+    if (testRoot()):
+        print("Script run as root")
+        app = QApplication(sys.argv)
+        form = Form()
+        print(app.exec_())
+        form.W_onfinished()
+        sys.exit()
+    else:
+        print("Please rerun this script with root.")
