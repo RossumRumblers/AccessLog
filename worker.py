@@ -6,7 +6,7 @@ from dependencies.USBFunc import *
 from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot
 
 #regular expression for identifying ASU Student ID's
-IDregex = ";601744(\d{10})1(\d{10})\?"
+IDregex = ";601744(\d{10})\d(\d{10})\?"
 # hardware ID's for the Scanner
 device_IDs = ["5131","2007"]
 
@@ -31,6 +31,7 @@ class Worker(QObject):
             IDdata = interpretEvents(readData(self.readerDevice))
             self.update.emit("Logging...",0)
             IDnum = extractID(IDdata, IDregex)
+            print(IDnum)
             if not IDnum:
                 continue
             #report ID
