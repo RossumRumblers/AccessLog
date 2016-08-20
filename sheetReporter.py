@@ -14,7 +14,7 @@ CopySpreadsheet = '1E_3Ulg6gMEhFclcggq0bOumZyezTo5WpshTpfFpXaLI'
 PasteSpreadsheet = '1Fu1LYy0Jp560BZeSySq5s-cvsdjj-RJ3Nde4V8siWB8'
 _scopes = 'https://www.googleapis.com/auth/spreadsheets' #Read/Write Spreadhseet Scope
 _discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?version=v4') #API Discovery URL
-_applicationName = "Lab Access Recorder Script" 
+_applicationName = "Lab Access Recorder Script"
 
 #
 # File name and Path Declarations
@@ -24,14 +24,14 @@ _CRED_FileName = "cred_store-RR.json"
 _Folder = ".cred"
 
 def _fileSetup():
-    #API Secrets file is in ~/.cred/secrets
-    #API access file is in ~/.cred
-    folderPath = os.path.join(os.path.expanduser('~'), _Folder)
-    os.makedirs(folderPath, exist_ok=True)
-    _SECRET_File = os.path.join(folderPath, _SECRET_FileName)
-    _CRED_File = os.path.join(folderPath, _CRED_FileName)
-    return [_SECRET_File, _CRED_File]
-    
+	#API Secrets file is in ~/.cred/secrets
+	#API access file is in ~/.cred
+	folderPath = os.path.join(os.path.expanduser('~'), _Folder)
+	os.makedirs(folderPath, exist_ok=True)
+	_SECRET_File = os.path.join(folderPath, _SECRET_FileName)
+	_CRED_File = os.path.join(folderPath, _CRED_FileName)
+	return [_SECRET_File, _CRED_File]
+
 #
 # Column Declarations
 #
@@ -48,60 +48,60 @@ _dateFormat = "%Y-%m-%d %H:%M:%S"
 
 # define singleton metclass
 class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+	_instances = {}
+	def __call__(cls, *args, **kwargs):
+		if cls not in cls._instances:
+			cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+		return cls._instances[cls]
 
 #define usage class for sheetreporter
 class Reporter(metaclass=Singleton):
-    def __init__(self):
-        credFiles = _fileSetup()
-        print(credFiles[0])
-        print(credFiles[1])
-        self._service = createAPIService(getCredentials(credFiles[1], credFiles[0], 
-                                    _scopes, _applicationName, False), _discoveryUrl)
+	def __init__(self):
+		credFiles = _fileSetup()
+		print(credFiles[0])
+		print(credFiles[1])
+		self._service = createAPIService(getCredentials(credFiles[1], credFiles[0],
+									_scopes, _applicationName, False), _discoveryUrl)
 
-    ###TODO###
-    # comments
-    def log(self, IDnum):
-        try:
-            searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
-            self.nextCell = len(searchList) + 2
-            lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
-            if datetime.today().day != lastDate.day:
-                self.nextCell +=1
-        except(NoValueReturnedError):
-            self.nextCell = 2
+	###TODO###
+	# comments
+	def log(self, IDnum):
+		try:
+			searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
+			self.nextCell = len(searchList) + 2
+			lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
+			if datetime.today().day != lastDate.day:
+				self.nextCell +=1
+		except(NoValueReturnedError):
+			self.nextCell = 2
 
-        IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
-        clockedtime = strftime(_dateFormat) 
-        userRow = None
-        for cell in range(0, len(IDlist)):
-            if not IDlist[cell]:
-                continue
-            if IDlist[cell][0] == IDnum:
-                userRow = cell+_IDColumnOffset
-                break
-        if not userRow:
-            updateRange(self._service, PasteSpreadsheet, 
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
-            updateRange(self._service, PasteSpreadsheet,
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
-            updateRange(self._service, PasteSpreadsheet, 
-                        "{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
-            self.nextCell +=1
-            return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
-        else:        
-            rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
-            result = requestRange(self._service, CopySpreadsheet, rangeRequest)
-            rangeUpdate = "B{0}:{0}".format(self.nextCell)
-            updateRange(self._service, PasteSpreadsheet, rangeUpdate, result)
-            rangeUpdate = "A{0}:A{0}".format(self.nextCell)
-            updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]])
-            self.nextCell +=1
-            return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
+		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
+		clockedtime = strftime(_dateFormat)
+		userRow = None
+		for cell in range(0, len(IDlist)):
+			if not IDlist[cell]:
+				continue
+			if IDlist[cell][0] == IDnum:
+				userRow = cell+_IDColumnOffset
+				break
+		if not userRow:
+			updateRange(self._service, PasteSpreadsheet,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
+			updateRange(self._service, PasteSpreadsheet,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
+			updateRange(self._service, PasteSpreadsheet,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
+			self.nextCell +=1
+			return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
+		else:
+			rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
+			result = requestRange(self._service, CopySpreadsheet, rangeRequest)
+			rangeUpdate = "B{0}:{0}".format(self.nextCell)
+			updateRange(self._service, PasteSpreadsheet, rangeUpdate, result)
+			rangeUpdate = "A{0}:A{0}".format(self.nextCell)
+			updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]])
+			self.nextCell +=1
+			return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
 
 if __name__ == '__main__':
-    _fileSetup()
+	_fileSetup()
