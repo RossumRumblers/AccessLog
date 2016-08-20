@@ -66,12 +66,14 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 ###TODO###
 # test root before runnning
 if __name__ == '__main__':
-    if (testRoot()):
-        print("Script run as root")
-        app = QApplication(sys.argv)
-        form = Form()
-        print(app.exec_())
-        form.W_onfinished()
-        sys.exit()
-    else:
+    if not testRoot():
         print("Please rerun this script with root.")
+        sys.exit()
+    if not testInternet():
+        print("Please Verify this machine is connected to the internet.")
+        sys.exit()
+    app = QApplication(sys.argv)
+    form = Form()
+    print(app.exec_())
+    form.W_onfinished()
+    sys.exit()
