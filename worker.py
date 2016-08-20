@@ -33,6 +33,7 @@ class Worker(QObject):
             IDnum = extractID(IDdata, IDregex)
             print(IDnum)
             if not IDnum:
+                self.update.emit("Please Scan only an ASU ID.", 3)
                 continue
             #report ID
             self.update.emit(sheetReporter.Reporter().log(IDnum), 3)
