@@ -78,10 +78,12 @@ class Reporter(metaclass=Singleton):
         IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
         clockedtime = strftime(_dateFormat) 
         userRow = None
-        for cell in range(len(IDlist)):
+        for cell in range(0, len(IDlist)):
+            if not IDlist[cell]:
+                continue
             if IDlist[cell][0] == IDnum:
                 userRow = cell+_IDColumnOffset
-                break;
+                break
         if not userRow:
             updateRange(self._service, PasteSpreadsheet, 
                         "{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
