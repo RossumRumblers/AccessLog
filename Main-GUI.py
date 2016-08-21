@@ -14,6 +14,12 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		QMainWindow.__init__(self)
 		self.setupUi(self)
 		self.postSetup()
+		if not testRoot():
+			print("Please rerun this script with root.")
+			sys.exit()
+		if not testInternet():
+			print("Please Verify this machine is connected to the internet.")
+			sys.exit()
 		sheetReporter.Reporter() # init Google API
 
 		#
@@ -66,12 +72,6 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 ###TODO###
 # test root before runnning
 if __name__ == '__main__':
-	if not testRoot():
-		print("Please rerun this script with root.")
-		sys.exit()
-	if not testInternet():
-		print("Please Verify this machine is connected to the internet.")
-		sys.exit()
 	app = QApplication(sys.argv)
 	form = Form()
 	print(app.exec_())
