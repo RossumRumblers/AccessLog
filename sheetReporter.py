@@ -20,26 +20,34 @@ _applicationName = "Lab Access Recorder Script"
 # File name and Path Declarations
 #
 _SECRET_FileName = "client_secret-RR.json"
-_CRED_FileName = "cred_store-RR.json"
-_Folder = ".cred"
+_CRED_FileName   = "cred_store-RR.json"
+_LOGIN_FileName  = "ActiveUsers"
+_baseFolder = ".aLog"
+_credFolder = "cred"
+
 
 def _fileSetup():
-	#API Secrets file is in ~/.cred/secrets
-	#API access file is in ~/.cred
-	folderPath = os.path.join(os.path.expanduser('~'), _Folder)
+	#API Secretsand access-cred file is in ~/.aLog/cred
+	#Logged in User file is in ~/.aLog/ActiveUsers
+	folderPath = os.path.join(os.path.expanduser('~'), _baseFolder)
+    credfolder = os.path.join(folderPath, _credFolder)
 	os.makedirs(folderPath, exist_ok=True)
-	_SECRET_File = os.path.join(folderPath, _SECRET_FileName)
-	_CRED_File = os.path.join(folderPath, _CRED_FileName)
-	return [_SECRET_File, _CRED_File]
+    os.makedirs(credfolder, exist_ok=True)
+	_SECRET_File = os.path.join(credfolder, _SECRET_FileName)
+	_CRED_File = os.path.join(credfolder, _CRED_FileName)
+
+
+	return [_SECRET_File, _CRED_File, ]
 
 #
 # Column Declarations
 #
 _IDColumnLetter = 'D' #Column of ID numbers
-_IDColumnOffset = 3 #First row we can start searching for a user.
-_IDColumn = _IDColumnLetter + str(_IDColumnOffset) + ":" + _IDColumnLetter
-_RrelevantInfo = ['B', 'I']
-_URelevantInfo = ['A', 'D', 'G']
+_IDColumnOffset = 3 #First row we can start searching for a user
+_IDColumn = "{0}{1}:{0}".format(_IDColumnLetter,str(_IDColumnOffset))
+
+_RrelevantInfo = ['B', 'I'] # Registered user relevant data columns
+_URelevantInfo = ['A', 'D', 'G'] # Unregister user relevant data columns
 
 #
 # Miscellaneous Declarations
@@ -63,21 +71,25 @@ class Reporter(metaclass=Singleton):
 		self._service = createAPIService(getCredentials(credFiles[1], credFiles[0],
 									_scopes, _applicationName, False), _discoveryUrl)
 
-	###TODO###
-	# comments
 	def log(self, IDnum):
 		try:
+            # Get the number of entries in the Access Log
 			searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
+            # keep track of next available cell
 			self.nextCell = len(searchList) + 2
+            # get the last day of sign-in
 			lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
 			if datetime.today().day != lastDate.day:
+                # if the last day was yesterday, add an empty row
 				self.nextCell +=1
 		except(NoValueReturnedError):
 			self.nextCell = 2
 
+        #get a list of all registered users ID numbers
 		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
 		clockedtime = strftime(_dateFormat)
 		userRow = None
+        # search through ID list for the provided ID number
 		for cell in range(0, len(IDlist)):
 			if not IDlist[cell]:
 				continue
@@ -85,21 +97,25 @@ class Reporter(metaclass=Singleton):
 				userRow = cell+_IDColumnOffset
 				break
 		if not userRow:
-			updateRange(self._service, PasteSpreadsheet,
-						"{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
-			updateRange(self._service, PasteSpreadsheet,
-						"{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
-			updateRange(self._service, PasteSpreadsheet,
-						"{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
+            # Log an unregistered User
+			updateRange(self._service, PasteSpreadsheet, "{0}{1}:{0}{1}".format(_URelevantInfo[0],
+						self.nextCell), [[clockedtime]])
+			updateRange(self._service, PasteSpreadsheet, "{0}{1}:{0}{1}".format(_URelevantInfo[1],
+						self.nextCell), [[IDnum]])
+			updateRange(self._service, PasteSpreadsheet, "{0}{1}:{0}{1}".format(_URelevantInfo[2],
+                        self.nextCell), [["Unregistered"]])
 			self.nextCell +=1
 			return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
 		else:
-			rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
-			result = requestRange(self._service, CopySpreadsheet, rangeRequest)
-			rangeUpdate = "B{0}:{0}".format(self.nextCell)
-			updateRange(self._service, PasteSpreadsheet, rangeUpdate, result)
-			rangeUpdate = "A{0}:A{0}".format(self.nextCell)
-			updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]])
+            # Log a registered User
+
+            #get the user's information from the members list
+			result = requestRange(self._service, CopySpreadsheet,
+                        "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow))
+
+			updateRange(self._service, PasteSpreadsheet, "B{0}:{0}".format(self.nextCell), result)
+			updateRange(self._service, PasteSpreadsheet, "A{0}:A{0}".format(self.nextCell), [[clockedtime]])
+
 			self.nextCell +=1
 			return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
 
