@@ -22,23 +22,26 @@ class Worker(QObject):
 
 	@pyqtSlot()
 	def USBworker(self):
+		print("alive-USB")
 		if not self.readerDevice:
 			self.finished.emit()
 		self.readerDevice.grab()
 		while(True):
 			# retrieve data from card scanner
-			print("scanning")
 			IDdata = interpretEvents(readData(self.readerDevice))
-			self.update.emit("Logging...",0)
+			self.update.emit("Logging...", 0)
 			IDnum = extractID(IDdata, IDregex)
-			print(IDnum)
+			print(IDdata, " : ", IDnum)
 			if not IDnum:
 				self.update.emit("Please Scan only an ASU ID.", 3)
 				continue
+
 			#report ID
 			self.update.emit(sheetReporter.Reporter().log(IDnum), 3)
+
 			#ensure the ID isnt double logged
 			IDnum = None
+			IDdata = None
 		self.readerDevice.ungrab()
 		self.finished.emit()
 

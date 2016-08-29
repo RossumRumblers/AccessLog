@@ -76,7 +76,7 @@ class Reporter(metaclass=Singleton):
 			self.nextCell = 2
 
 		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
-		clockedtime = strftime(_dateFormat)
+		clockedtime = datetime.now().strftime(_dateFormat)
 		userRow = None
 		for cell in range(0, len(IDlist)):
 			if not IDlist[cell]:
