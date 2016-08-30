@@ -28,19 +28,25 @@ class Worker(QObject):
 		while(True):
 			# retrieve data from card scanner
 			IDdata = interpretEvents(readData(self.readerDevice))
+			print("Card Scanned ", IDdata)
 			self.update.emit("Logging...", 0)
+			print("emitted Logging ")
 			IDnum = extractID(IDdata, IDregex)
-			print(IDdata, " : ", IDnum)
+			print("Card Scanned ", IDnum)
 			if not IDnum:
+				print("IDnum DNE ")
 				self.update.emit("Please Scan only an ASU ID.", 3)
+				print("Emitted non-valid")
 				continue
-
-			#report ID
-			self.update.emit(sheetReporter.Reporter().log(IDnum), 3)
-
+			else:
+				print("IDnum E ")
+				#report ID
+				self.update.emit(sheetReporter.Reporter().log(IDnum), 3)
+				print("LOG IDnum")
 			#ensure the ID isnt double logged
 			IDnum = None
 			IDdata = None
+			print("Clearing Data, restarting")
 		self.readerDevice.ungrab()
 		self.finished.emit()
 
