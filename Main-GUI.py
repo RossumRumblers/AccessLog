@@ -4,6 +4,7 @@ import debug
 import worker
 import mainWindow
 import sheetReporter
+from datetime import datetime
 from dependencies.miscFunc import *
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget
@@ -12,15 +13,15 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWin
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
 	def __init__(self, parent=None):
-		QMainWindow.__init__(self)
-		self.setupUi(self)
-		self.postSetup()
 		if not testRoot():
 			print("Please rerun this script with root.")
 			sys.exit()
 		if not testInternet():
 			print("Please Verify this machine is connected to the internet.")
 			sys.exit()
+		QMainWindow.__init__(self)
+		self.setupUi(self)
+		self.postSetup()
 		sheetReporter.Reporter() # init Google API
 
 		#
@@ -74,10 +75,10 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		else:
 			self.updateStatus("Logging...", 0)
 			self.lineEdit.setText("")
-			p = re.compile("\d{10}")
-			match = re.search(p, IDnum)
-			if match:
+			if len(IDnum) == 10 and IDnum.isdigit():
 				self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
+			else:
+				self.updateStatus("Please Enter an ASU ID", 3)
 
 	def updateStatus(self, message, time):
 		# time is in seconds
@@ -87,6 +88,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 ###TODO###
 # test root before runnning
 if __name__ == '__main__':
+	print("\nScript run at ", datetime.now(), "\n=========================================")
 	app = QApplication(sys.argv)
 	form = Form()
 	app.exec_()

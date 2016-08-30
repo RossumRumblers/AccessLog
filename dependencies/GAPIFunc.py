@@ -98,7 +98,7 @@ def updateRanges(service, SpreadsheetId, JSONrequest):
 	"""
 	function currently broken
 	https://developers.google.com/sheets/reference/rest/v4/spreadsheets/request#Request
-	""" 
+	"""
 	valueRanges = []
 	for array in sheetData:
 		ranges.append({'values': array})
@@ -114,7 +114,7 @@ def updateRanges(service, SpreadsheetId, JSONrequest):
 
 def autoResizeRange(service, SpreadsheetId, range):
 	"""function currently broken
-	""" 
+	"""
 	requestBody = {
 		'requests': [{
 				"autoResizeDimensions": {

@@ -22,7 +22,6 @@ class Worker(QObject):
 
 	@pyqtSlot()
 	def USBworker(self):
-		print("alive-USB")
 		if not self.readerDevice:
 			self.finished.emit()
 		self.readerDevice.grab()

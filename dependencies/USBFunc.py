@@ -80,7 +80,6 @@ def interpretEvents(keyEvents):
 			resultString += "="
 			continue
 		raise KeyError("Undefined Key: " + event.keycode)
-	print(resultString)
 	return resultString
 
 #

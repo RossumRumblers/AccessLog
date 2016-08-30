@@ -1,0 +1,26 @@
+USB Device 5131:2007 found
+=========================================
+Script run at  2016-08-29 17:05:21.354056 
+=========================================
+/home/zawata/.cred/client_secret-RR.json
+/home/zawata/.cred/cred_store-RR.json
+USB Device 5131:2007 found
+=========================================
+Script run at  2016-08-29 17:10:59.354054 
+=========================================
+/home/zawata/.cred/client_secret-RR.json
+/home/zawata/.cred/cred_store-RR.json
+USB Device 5131:2007 found
+=========================================
+Script run at  2016-08-29 17:13:44.821276 
+=========================================
+/home/zawata/.cred/client_secret-RR.json
+/home/zawata/.cred/cred_store-RR.json
+USB Device 5131:2007 found
+=========================================
+Script run at  2016-08-29 17:15:06.726051 
+=========================================
+/home/zawata/.cred/client_secret-RR.json
+/home/zawata/.cred/cred_store-RR.json
+%?  :  None
+%?;601744120746703611207467036?  :  1207467036

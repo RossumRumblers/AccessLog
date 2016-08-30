@@ -13,7 +13,6 @@ class Debug(QObject):
 
 	@pyqtSlot()
 	def Debugworker(self):
-		print("alive")
 		lastlog = datetime.now()
 		strftime("%Y-%m-%d %H:%M:%S")
 		while(True):
