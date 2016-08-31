@@ -66,6 +66,8 @@ class Reporter(metaclass=Singleton):
 	###TODO###
 	# comments
 	def log(self, IDnum):
+		print("IDnum")
+		print("doing nextCell")
 		try:
 			searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
 			self.nextCell = len(searchList) + 2
@@ -74,17 +76,21 @@ class Reporter(metaclass=Singleton):
 				self.nextCell +=1
 		except(NoValueReturnedError):
 			self.nextCell = 2
-
+		print("getting IDlist")
 		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
+		print("getting clocked date")
 		clockedtime = datetime.now().strftime(_dateFormat)
 		userRow = None
+		print("checking IDlist")
 		for cell in range(0, len(IDlist)):
 			if not IDlist[cell]:
 				continue
 			if IDlist[cell][0] == IDnum:
 				userRow = cell+_IDColumnOffset
 				break
+		print("checking user")
 		if not userRow:
+			print("unregistered user")
 			updateRange(self._service, PasteSpreadsheet,
 						"{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
 			updateRange(self._service, PasteSpreadsheet,
@@ -92,8 +98,10 @@ class Reporter(metaclass=Singleton):
 			updateRange(self._service, PasteSpreadsheet,
 						"{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
 			self.nextCell +=1
+			print("finishing unregistered user")
 			return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
 		else:
+			print("registered user")
 			rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
 			result = requestRange(self._service, CopySpreadsheet, rangeRequest)
 			rangeUpdate = "B{0}:{0}".format(self.nextCell)
@@ -101,6 +109,7 @@ class Reporter(metaclass=Singleton):
 			rangeUpdate = "A{0}:A{0}".format(self.nextCell)
 			updateRange(self._service, PasteSpreadsheet, rangeUpdate, [[clockedtime]])
 			self.nextCell +=1
+			print("finishing registered user")
 			return("User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
 
 if __name__ == '__main__':
