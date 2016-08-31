@@ -70,12 +70,18 @@ class Reporter(metaclass=Singleton):
 		print("doing nextCell")
 		try:
 			searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
+			print("1")
 			self.nextCell = len(searchList) + 2
+			print("2")
 			lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
+			print("3")
 			if datetime.today().day != lastDate.day:
 				self.nextCell +=1
+			print("4")
 		except(NoValueReturnedError):
+			print("5")
 			self.nextCell = 2
+		print("6")
 		print("getting IDlist")
 		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
 		print("getting clocked date")
