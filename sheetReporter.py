@@ -69,7 +69,9 @@ class Reporter(metaclass=Singleton):
 		print("IDnum")
 		print("doing nextCell")
 		try:
+			print("0")
 			searchList = requestRange(self._service, PasteSpreadsheet, "A2:A")
+			print(searchList)
 			print("1")
 			self.nextCell = len(searchList) + 2
 			print("2")
