@@ -66,8 +66,11 @@ def createAPIService(credentials, discoveryUrl):
 # Request Range via get command
 #
 def requestRange(service, SpreadsheetId, range):
+	print("Retrieving range.")
 	returnedRange = service.spreadsheets().values().get(spreadsheetId=SpreadsheetId, range=range).execute()
+	print("Done retrieving.")
 	values = returnedRange.get('values', [])
+	print("Done Getting")
 	if not values:
 		raise NoValueReturnedError(range)
 	else:
