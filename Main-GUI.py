@@ -11,27 +11,27 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWin
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
 	def __init__(self, parent=None):
-		QMainWindow.__init__(self)
-		self.setupUi(self)
-		self.postSetup()
 		if not testRoot():
 			print("Please rerun this script with root.")
 			sys.exit()
 		if not testInternet():
 			print("Please Verify this machine is connected to the internet.")
 			sys.exit()
+		QMainWindow.__init__(self)
+		self.setupUi(self)
+		self.postSetup()
 		sheetReporter.Reporter() # init Google API
 
 		#
 		# worker thread code from http://stackoverflow.com/a/33453124
 		#
-		self.obj = worker.Worker()                        # instatiate worker object
-		self.wThread = QThread()                          # instatiate worker thread
-		self.obj.moveToThread(self.wThread)               # move the worker object into the worker thread
-		self.obj.update.connect(self.W_onUpdate)          # connect the update emitter to the onUpdate function
-		self.obj.finished.connect(self.W_onfinished)      # connect the finished emitter to the kill thread function
-		self.wThread.started.connect(self.obj.USBworker)  # on thread start run the USBworker function
-		self.wThread.start()                              # start the worker thread
+		self.workerobj = worker.Worker()                        # instatiate worker object
+		self.wThread = QThread()                                # instatiate worker thread
+		self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
+		self.workerobj.update.connect(self.W_onUpdate)          # connect the update emitter to the onUpdate function
+		self.workerobj.finished.connect(self.W_onFinished)      # connect the finished emitter to the kill thread function
+		self.wThread.started.connect(self.workerobj.USBworker)  # on thread start run the USBworker function
+		self.wThread.start()                                    # start the worker thread
 
 		self.lineEdit.returnPressed.connect(self.pushButton.click)
 		self.pushButton.clicked.connect(self.buttonPushed)
@@ -48,7 +48,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 	def W_onUpdate(self, string, time):
 		self.updateStatus(string, time)
 
-	def W_onfinished(self):
+	def W_onFinished(self):
 		self.wThread.quit()
 		self.obj.USBworkerfinish()
 
@@ -59,10 +59,10 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		else:
 			self.updateStatus("Logging...", 0)
 			self.lineEdit.setText("")
-			p = re.compile("\d{10}")
-			match = re.search(p, IDnum)
-			if match:
+			if len(IDnum) == 10 and IDnum.isdigit():
 				self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
+			else:
+				self.updateStatus("Please Enter an ASU ID", 3)
 
 	def updateStatus(self, message, time):
 		# time is in seconds
@@ -74,6 +74,5 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	form = Form()
-	print(app.exec_())
-	form.W_onfinished()
+	app.exec_()
 	sys.exit()

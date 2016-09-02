@@ -58,8 +58,6 @@ class Singleton(type):
 class Reporter(metaclass=Singleton):
 	def __init__(self):
 		credFiles = _fileSetup()
-		print(credFiles[0])
-		print(credFiles[1])
 		self._service = createAPIService(getCredentials(credFiles[1], credFiles[0],
 									_scopes, _applicationName, False), _discoveryUrl)
 
@@ -74,9 +72,8 @@ class Reporter(metaclass=Singleton):
 				self.nextCell +=1
 		except(NoValueReturnedError):
 			self.nextCell = 2
-
 		IDlist = requestRange(self._service, CopySpreadsheet, _IDColumn)
-		clockedtime = strftime(_dateFormat)
+		clockedtime = datetime.now().strftime(_dateFormat)
 		userRow = None
 		for cell in range(0, len(IDlist)):
 			if not IDlist[cell]:
