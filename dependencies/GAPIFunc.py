@@ -2,7 +2,7 @@
 # Functions For simplyifying access to the Google API
 #
 
-import httplib2
+import httplib2shim
 import oauth2client
 
 from oauth2client import tools
@@ -54,7 +54,7 @@ def getCredentials(CRED_File, Secret_File, Scopes, APPLICATION_NAME, rebuild):
 # Create API Service for acccessing spreadsheets
 #
 def createAPIService(credentials, discoveryUrl):
-	http = credentials.authorize(httplib2.Http())
+	http = credentials.authorize(httplib2shim.Http())
 	if not http:
 		return None
 	service = discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
