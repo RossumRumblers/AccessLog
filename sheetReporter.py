@@ -3,6 +3,7 @@
 #
 
 import os
+import JSONReader
 from dependencies.GAPIFunc import *
 from time import strftime
 from datetime import datetime
@@ -10,9 +11,6 @@ from datetime import datetime
 #
 # Google Spreadsheet Declarations
 #
-RRsheet = '1E_3Ulg6gMEhFclcggq0bOumZyezTo5WpshTpfFpXaLI'
-HLsheet = '1BbDVHSxxANdlDytOVXed_ZQvc4zIxDqsRowsgj16YL8'
-Logsheet = '1Fu1LYy0Jp560BZeSySq5s-cvsdjj-RJ3Nde4V8siWB8'
 _scopes = 'https://www.googleapis.com/auth/spreadsheets' #Read/Write Spreadhseet Scope
 _discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?version=v4') #API Discovery URL
 _applicationName = "Lab Access Recorder Script"
@@ -20,8 +18,8 @@ _applicationName = "Lab Access Recorder Script"
 #
 # File name and Path Declarations
 #
-_SECRET_FileName = "client_secret-RR.json"
-_CRED_FileName = "cred_store-RR.json"
+_SECRET_FileName = "client_secret-S90.json"
+_CRED_FileName = "cred_store-S90.json"
 _Folder = ".cred"
 
 def _fileSetup():
@@ -36,11 +34,19 @@ def _fileSetup():
 #
 # Column Declarations
 #
-_IDColumnLetter = 'D' #Column of ID numbers
-_IDColumnOffset = 3 #First row we can start searching for a user.
-_IDColumn = _IDColumnLetter + str(_IDColumnOffset) + ":" + _IDColumnLetter
-_RrelevantInfo = ['B', 'I']
-_URelevantInfo = ['A', 'D', 'G']
+_IDColumn = "D3:D"               # mandatory
+_RrelevantInfo = ['B', 'I']      # mandatory
+_URelevantInfo = ['A', 'D', 'G'] # mandatory
+_FirstRowDim = "A1:I1"
+_FirstRow = [["Date: Time"],
+			 ["First Name"],
+			 ["Last Name"],
+			 ["ASU ID #"],
+			 ["ASU Email Address"],
+			 ["Major"],
+			 ["Membership Status"],
+			 ["Undergraduate/Graduate Student"],
+			 ["Alternate Email"]]
 
 #
 # Miscellaneous Declarations
@@ -64,63 +70,62 @@ class Reporter(metaclass=Singleton):
 
 	###TODO###
 	# comments
-	def log(self, IDnum):
+	def log(self, IDnum, Club):
+		
+		# get specific information related to club
+		ClubShortName = JSONReader().getClubNameShort(Club)
+		ClubRosterID = JSONReader().getRosterID(Club)
+		ClubAccessID = JSONReader().getLogID(Club)
+
+		# get the next available cell for writing
+		# if the last entry was on a different Day, skip a line
 		try:
-			searchList = requestRange(self._service, Logsheet, "A2:A")
+			searchList = requestRange(self._service, ClubAccessID, "A2:A")
 			self.nextCell = len(searchList) + 2
 			lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
 			if datetime.today().day != lastDate.day:
 				self.nextCell +=1
 		except(NoValueReturnedError):
+			# No Data in spreadhseet, start fresh
+			updateRange(self._service, ClubAccessID, _FirstRowDim, _FirstRow)
 			self.nextCell = 2
-		RR_IDlist = requestRange(self._service, RRsheet, _IDColumn)
-		HL_IDlist = requestRange(self._service, HLsheet, _IDColumn)
+		
+		# get Searchable List of User ID's
+		IDlist = requestRange(self._service, ClubRosterID, _IDColumn)
 
+		# get clocked time of the User
 		clockedtime = datetime.now().strftime(_dateFormat)
 
 		userRow = None
-
-		for cell in range(0, len(RR_IDlist)):
-			if not RR_IDlist[cell]:
+		
+		#Search IDlist for the user ID 
+		for cell in range(0, len(IDlist)):
+			if not IDlist[cell]:
 				continue
-			if RR_IDlist[cell][0] == IDnum:
+			if IDlist[cell][0] == IDnum:
 				userRow = cell + _IDColumnOffset
 				break
+		
 		if userRow:
 			rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
-			result = requestRange(self._service, RRsheet, rangeRequest)
+			result = requestRange(self._service, ClubRosterID, rangeRequest)
+			
 			rangeUpdate = "B{0}:{0}".format(self.nextCell)
-			updateRange(self._service, Logsheet, rangeUpdate, result)
+			updateRange(self._service, ClubAccessID, rangeUpdate, result)
 			rangeUpdate = "A{0}:A{0}".format(self.nextCell)
-			updateRange(self._service, Logsheet, rangeUpdate, [[clockedtime]])
+			updateRange(self._service, ClubAccessID, rangeUpdate, [[clockedtime]])
 			self.nextCell +=1
-			return("Robotics User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
+			return("{0} User {1} {2} clocked in at {3}".format(ClubShortName, result[0][0], result[0][1], clockedtime))
+			
 		else:
-			for cell in range(0, len(HL_IDlist)):
-				if not HL_IDlist[cell]:
-					continue
-				if HL_IDlist[cell][0] == IDnum:
-					userRow = cell + _IDColumnOffset
-					break
-
-			if userRow:
-				rangeRequest = "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow)
-				result = requestRange(self._service, HLsheet, rangeRequest)
-				rangeUpdate = "B{0}:{0}".format(self.nextCell)
-				updateRange(self._service, Logsheet, rangeUpdate, result)
-				rangeUpdate = "A{0}:A{0}".format(self.nextCell)
-				updateRange(self._service, Logsheet, rangeUpdate, [[clockedtime]])
-				self.nextCell +=1
-				return("HyperLoop User {0} {1} clocked in at {2}".format(result[0][0], result[0][1], clockedtime))
-			else:
-				updateRange(self._service, Logsheet,
-							"{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
-				updateRange(self._service, Logsheet,
-							"{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
-				updateRange(self._service, Logsheet,
-							"{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
-				self.nextCell +=1
-				return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
+			updateRange(self._service, ClubAccessID,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
+			updateRange(self._service, ClubAccessID,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
+			updateRange(self._service, ClubAccessID,
+						"{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
+			self.nextCell +=1
+			return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
 
 if __name__ == '__main__':
 	_fileSetup()
