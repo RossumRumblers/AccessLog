@@ -25,7 +25,7 @@
   <property name="maximumSize">
    <size>
     <width>590</width>
-    <height>155</height>
+    <height>174</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -59,112 +59,171 @@
      <height>155</height>
     </size>
    </property>
-   <widget class="QLabel" name="label">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>195</x>
-      <y>20</y>
-      <width>200</width>
-      <height>20</height>
+      <x>10</x>
+      <y>0</y>
+      <width>222</width>
+      <height>131</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <kerning>true</kerning>
-     </font>
-    </property>
-    <property name="text">
-     <string>Please Scan your ASU ID Card</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="Club1">
+       <property name="text">
+        <string>Club 1</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="Club2">
+       <property name="text">
+        <string>Club 2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="Club3">
+       <property name="text">
+        <string>Club 3</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="Club4">
+       <property name="text">
+        <string>Club 4</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="Club5">
+       <property name="text">
+        <string>Club 5</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="Club6">
+       <property name="text">
+        <string>Club 6</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>70</y>
-      <width>170</width>
-      <height>60</height>
+      <x>360</x>
+      <y>0</y>
+      <width>221</width>
+      <height>131</height>
      </rect>
     </property>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>5</x>
-       <y>30</y>
-       <width>100</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>IBeamCursor</cursorShape>
-     </property>
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton">
-     <property name="geometry">
-      <rect>
-       <x>115</x>
-       <y>30</y>
-       <width>51</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Submit</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>130</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Enter Your ASU ID:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="indent">
-      <number>-1</number>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>275</x>
-      <y>50</y>
-      <width>40</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OR</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <property name="indent">
-     <number>-1</number>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="text">
+          <string>Please Swipe your ASU ID Card</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>OR</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="indent">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>30</y>
+            <width>100</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
+          </property>
+          <property name="mouseTracking">
+           <bool>false</bool>
+          </property>
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton">
+          <property name="geometry">
+           <rect>
+            <x>130</x>
+            <y>30</y>
+            <width>50</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Submit</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_3">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>10</y>
+            <width>130</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Enter Your ASU ID:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="indent">
+           <number>-1</number>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">

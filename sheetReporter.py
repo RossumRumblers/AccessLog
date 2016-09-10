@@ -3,17 +3,17 @@
 #
 
 import os
-import JSONReader
-from dependencies.GAPIFunc import *
 from time import strftime
 from datetime import datetime
+from JSONReader import JSONReader
+from dependencies.GAPIFunc import *
 
 #
 # Google Spreadsheet Declarations
 #
 _scopes = 'https://www.googleapis.com/auth/spreadsheets' #Read/Write Spreadhseet Scope
 _discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?version=v4') #API Discovery URL
-_applicationName = "Lab Access Recorder Script"
+_applicationName = "Kiosk Access"
 
 #
 # File name and Path Declarations
@@ -34,19 +34,21 @@ def _fileSetup():
 #
 # Column Declarations
 #
-_IDColumn = "D3:D"               # mandatory
-_RrelevantInfo = ['B', 'I']      # mandatory
-_URelevantInfo = ['A', 'D', 'G'] # mandatory
+_IDColumnOffset = 3
+_IDColumn = "D{0}:D".format(_IDColumnOffset) # mandatory
+_RrelevantInfo = ['B', 'I']                  # mandatory
+_URelevantInfo = ['A', 'D', 'G']             # mandatory
+
 _FirstRowDim = "A1:I1"
-_FirstRow = [["Date: Time"],
-			 ["First Name"],
-			 ["Last Name"],
-			 ["ASU ID #"],
-			 ["ASU Email Address"],
-			 ["Major"],
-			 ["Membership Status"],
-			 ["Undergraduate/Graduate Student"],
-			 ["Alternate Email"]]
+_FirstRow = ["Date: Time",
+			 "First Name",
+			 "Last Name",
+			 "ASU ID #",
+			 "ASU Email Address",
+			 "Major",
+			 "Membership Status",
+			 "Undergraduate/Graduate Student",
+			 "Alternate Email"]
 
 #
 # Miscellaneous Declarations
@@ -87,7 +89,7 @@ class Reporter(metaclass=Singleton):
 				self.nextCell +=1
 		except(NoValueReturnedError):
 			# No Data in spreadhseet, start fresh
-			updateRange(self._service, ClubAccessID, _FirstRowDim, _FirstRow)
+			updateRange(self._service, ClubAccessID, _FirstRowDim, [_FirstRow])
 			self.nextCell = 2
 		
 		# get Searchable List of User ID's

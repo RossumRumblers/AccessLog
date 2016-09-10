@@ -1,11 +1,16 @@
+#
+# Version 2.0.0B
+#
+
 import re
 import sys
 import worker
 import mainWindow
+import JSONReader
 import sheetReporter
 from dependencies.miscFunc import *
 from PyQt5.QtCore import QThread, Qt
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget, QRadioButton
 
 
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
@@ -25,12 +30,11 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		#
 		# worker thread code from http://stackoverflow.com/a/33453124
 		#
-		self.workerobj = worker.Worker()                        # instatiate worker object
+		self.workerobj = worker.Worker(self)                    # instatiate worker object
 		self.wThread = QThread()                                # instatiate worker thread
 		self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
-		self.workerobj.update.connect(self.W_onUpdate)          # connect the update emitter to the onUpdate function
-		self.workerobj.finished.connect(self.W_onFinished)      # connect the finished emitter to the kill thread function
-		self.wThread.started.connect(self.workerobj.USBworker)  # on thread start run the USBworker function
+		self.workerobj._updateStatus.connect(self.W_onUpdate)    # connect the update emitter to the onUpdate function
+		self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
 		self.wThread.start()                                    # start the worker thread
 
 		self.lineEdit.returnPressed.connect(self.pushButton.click)
@@ -40,10 +44,19 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
 
 	def postSetup(self):
-		self.setWindowFlags(Qt.FramelessWindowHint)
+		#self.setWindowFlags(Qt.FramelessWindowHint)
 		frameGeo = self.frameGeometry()
 		frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
 		self.move(frameGeo.topLeft())
+		
+		i = 0
+		for radio in self.findChildren(QRadioButton):
+			try:
+				elem = JSONReader.JSONReader().getClubNameLong(JSONReader.JSONReader().getClubList()[i])
+				radio.setText(elem)
+			except(IndexError):
+				radio.hide()
+			i+=1
 
 	def W_onUpdate(self, string, time):
 		self.updateStatus(string, time)
@@ -60,9 +73,26 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 			self.updateStatus("Logging...", 0)
 			self.lineEdit.setText("")
 			if len(IDnum) == 10 and IDnum.isdigit():
-				self.updateStatus(sheetReporter.Reporter().log(IDnum), 3)
+				clubName = self.getSelectedRadio()
+				clubID = None
+				for club in JSONReader.JSONReader().getClubList():
+					if(JSONReader.JSONReader().getClubNameLong(club) == clubName):
+						clubID = JSONReader.JSONReader().getClubNameShort(club)
+				self.updateStatus(sheetReporter.Reporter().log(IDnum, clubID), 3)
 			else:
 				self.updateStatus("Please Enter an ASU ID", 3)
+
+	def getSelectedRadio(self):
+		i = 0
+		for radio in self.findChildren(QRadioButton):
+			if(radio):
+				if(radio.isChecked()):
+					text = radio.text()
+					print(text)
+					return text
+			else:
+				break
+			i+=1
 
 	def updateStatus(self, message, time):
 		# time is in seconds
