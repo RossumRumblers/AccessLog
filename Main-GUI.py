@@ -1,5 +1,5 @@
 #
-# Version 2.0.0B
+# Version 2.0.1B
 #
 
 import re
@@ -33,7 +33,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		self.workerobj = worker.Worker(self)                    # instatiate worker object
 		self.wThread = QThread()                                # instatiate worker thread
 		self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
-		self.workerobj._updateStatus.connect(self.W_onUpdate)    # connect the update emitter to the onUpdate function
+		self.workerobj._updateStatus.connect(self.updateStatus) # connect the update emitter to the onUpdate function
 		self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
 		self.wThread.start()                                    # start the worker thread
 
@@ -48,7 +48,6 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		frameGeo = self.frameGeometry()
 		frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
 		self.move(frameGeo.topLeft())
-		
 		i = 0
 		for radio in self.findChildren(QRadioButton):
 			try:
@@ -57,9 +56,6 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 			except(IndexError):
 				radio.hide()
 			i+=1
-
-	def W_onUpdate(self, string, time):
-		self.updateStatus(string, time)
 
 	def W_onFinished(self):
 		self.wThread.quit()
@@ -74,33 +70,31 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 			self.lineEdit.setText("")
 			if len(IDnum) == 10 and IDnum.isdigit():
 				clubName = self.getSelectedRadio()
+				self.setSelectedRadio(clubName)
 				clubID = None
 				for club in JSONReader.JSONReader().getClubList():
 					if(JSONReader.JSONReader().getClubNameLong(club) == clubName):
-						clubID = JSONReader.JSONReader().getClubNameShort(club)
+						clubID = club
 				self.updateStatus(sheetReporter.Reporter().log(IDnum, clubID), 3)
 			else:
 				self.updateStatus("Please Enter an ASU ID", 3)
 
 	def getSelectedRadio(self):
-		i = 0
 		for radio in self.findChildren(QRadioButton):
-			if(radio):
-				if(radio.isChecked()):
-					text = radio.text()
-					print(text)
-					return text
-			else:
-				break
-			i+=1
+			if(radio.isChecked()):
+				text = radio.text()
+				print(text)
+				return text
+
+	def setSelectedRadio(self, name):
+		for radio in self.findChildren(QRadioButton):
+			if name == radio.text():
+				radio.setChecked(True)
 
 	def updateStatus(self, message, time):
-		# time is in seconds
+		'''time is in seconds'''
 		self.statusBar.showMessage(message, time*1000)
 
-
-###TODO###
-# test root before runnning
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	form = Form()

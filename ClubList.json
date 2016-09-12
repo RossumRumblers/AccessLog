@@ -14,13 +14,13 @@
             "Long Name":   "ASU HyperLoop Team",
             "Short Name":  "AZ Loop",
             "Member List": "1BbDVHSxxANdlDytOVXed_ZQvc4zIxDqsRowsgj16YL8",
-            "Log File":    "Failure"
+            "Log File":    "1DPtmxDkgAry1eYUqq3L_SY-9fweitqebmvstLAG88Dc"
         },
-		"Another Club": {
-			"Long Name":   "A longer Club Name",
-			"Short Name":  "Club",
-			"Member List": "insert super long spreadhseet ID",
-			"Log File":    "insert super long spreadhseet ID"
+		"ClubID": {
+			"Long Name":   "A Long Club Name",
+			"Short Name":  "Short Name",
+			"Member List": "Memberlist Spreadsheet ID",
+			"Log File":    "AccessLog Spreadsheet ID"
 		}
     }
 }

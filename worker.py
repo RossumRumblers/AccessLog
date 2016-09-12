@@ -44,12 +44,15 @@ class Worker(QObject):
 			else:
 				#get club Identifier from the Name on the RadioButton
 				clubName = self._mainWindow.getSelectedRadio()
+				self._mainWindow.setSelectedRadio(clubName)
 				clubID = None
 				for club in JSONReader.JSONReader().getClubList():
 					if(JSONReader.JSONReader().getClubNameLong(club) == clubName):
-						clubID = JSONReader.JSONReader().getClubNameShort(club)
+						clubID = club
+						
 				#report ID
 				self._updateStatus.emit(sheetReporter.Reporter().log(IDnum, clubID), 3)
+
 			#ensure the ID isnt double logged
 			IDnum = None
 			IDdata = None

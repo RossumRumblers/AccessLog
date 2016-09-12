@@ -168,7 +168,7 @@
           </property>
           <property name="geometry">
            <rect>
-            <x>20</x>
+            <x>25</x>
             <y>30</y>
             <width>100</width>
             <height>20</height>
@@ -190,7 +190,7 @@
          <widget class="QPushButton" name="pushButton">
           <property name="geometry">
            <rect>
-            <x>130</x>
+            <x>135</x>
             <y>30</y>
             <width>50</width>
             <height>20</height>
