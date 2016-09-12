@@ -1,0 +1,26 @@
+{
+    "Clubs": [
+        "Robotics",
+        "HyperLoop"
+    ],
+    "Club-info": {
+        "Robotics": {
+            "Long Name":   "Rossum Rumblers Robotics Club",
+            "Short Name":  "Robotics",
+            "Member List": "1E_3Ulg6gMEhFclcggq0bOumZyezTo5WpshTpfFpXaLI",
+            "Log File":    "1FF3gYWWHXsebDUHG935QoLzQSqY7OMN8DJcDmbGScBY"
+        },
+        "HyperLoop": {
+            "Long Name":   "ASU HyperLoop Team",
+            "Short Name":  "AZ Loop",
+            "Member List": "1BbDVHSxxANdlDytOVXed_ZQvc4zIxDqsRowsgj16YL8",
+            "Log File":    "1DPtmxDkgAry1eYUqq3L_SY-9fweitqebmvstLAG88Dc"
+        },
+		"ClubID": {
+			"Long Name":   "A Long Club Name",
+			"Short Name":  "Short Name",
+			"Member List": "Memberlist Spreadsheet ID",
+			"Log File":    "AccessLog Spreadsheet ID"
+		}
+    }
+}
