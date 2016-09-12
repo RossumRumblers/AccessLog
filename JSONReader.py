@@ -26,17 +26,17 @@ class JSONReader(metaclass=Singleton) :
 		return self.JSONdata['Clubs']
 
 	#get specfic Club data
-	def getClubNameShort(self,clubName):
-		return self.JSONdata['Club-info'][clubName]['Short Name']
+	def getClubNameShort(self,clubID):
+		return self.JSONdata['Club-info'][clubID]['Short Name']
 
-	def getClubNameLong(self,clubName):
-		return self.JSONdata['Club-info'][clubName]['Long Name']
+	def getClubNameLong(self,clubID):
+		return self.JSONdata['Club-info'][clubID]['Long Name']
 	
-	def getRosterID(self,clubName):
-		return self.JSONdata['Club-info'][clubName]['Member List']
+	def getRosterID(self,clubID):
+		return self.JSONdata['Club-info'][clubID]['Member List']
 
-	def getLogID(self,clubName):
-		return self.JSONdata['Club-info'][clubName]['Log File']
+	def getLogID(self,clubID):
+		return self.JSONdata['Club-info'][clubID]['Log File']
 
 
 if __name__ == '__main__':
