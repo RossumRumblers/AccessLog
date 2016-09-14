@@ -1,3 +1,4 @@
+import os
 import json
 
 #
@@ -17,7 +18,8 @@ class JSONReader(metaclass=Singleton) :
 
 	def __init__(self):
 		#open file with requirement to close
-		with open(JSONFile) as f:
+		JSONFilePath = os.path.join(os.path.dirname(__file__), JSONFile)
+		with open(JSONFilePath) as f:
 			#open JSON file as a string and strip line endings
 			self.JSONdata=json.loads("".join(l.rstrip() for l in f))
 
