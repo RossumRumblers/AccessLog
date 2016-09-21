@@ -94,44 +94,66 @@ def updateRange(service, SpreadsheetId, range, sheetData):
 		raise RangeNotUpdatedError(valueRange)
 	return returnedRange
 
-def updateRanges(service, SpreadsheetId, JSONrequest):
-	"""
-	function currently broken
-	https://developers.google.com/sheets/reference/rest/v4/spreadsheets/request#Request
-	"""
-	valueRanges = []
-	for array in sheetData:
-		ranges.append({'values': array})
-	requestBody = {'data': ranges}
-	print(requestBody)
-	if inputType in ['RAW', 'USER_ENTERED']:
-		returnedRange = service.spreadsheets().values().batchUpdate(spreadsheetId=SpreadsheetId, body=requestBody).execute()
-		if not returnedRange:
-			raise RangeNotUpdatedError(valueRange)
-	else:
-		raise InvalidInputTypeError(ranges)
-	return returnedRange
+def getAllSheets(service, SpreadsheetId):
+	sheet_metadata = service.spreadsheets().get(spreadsheetId=SpreadsheetId).execute()
+	sheets = sheet_metadata.get('sheets', '')
+	sheetsArr = []
+	for sheet in sheets:
+		prop = sheet.get('properties', {})
+		item = {
+			'SheetId': prop.get('SheetId', ""), 
+			'title':   prop.get('title', ""), 
+			'index':   prop.get('index', "")
+		}
+		sheetsArr.append(item)
+	return sheetsArr
 
-def autoResizeRange(service, SpreadsheetId, range):
-	"""function currently broken
-	"""
-	requestBody = {
-		'requests': [{
-				"autoResizeDimensions": {
-					"dimensions": {
-						"sheetId": SpreadsheetId,
-						"dimension": "Columns",
-						"startIndex": number,
-						"endIndex": number,
-					}
-				}
-			}
-		],
+def batchUpdate(service, SpreadsheetId, requests):
+	body = {
+		'requests': requests
 	}
-	if inputType in ['ROWS', 'COLUMNS']:
-		returnedRange = service.spreadsheets().values().update(spreadsheetId=SpreadsheetId, range=range, body=requestBody, valueInputOption=inputType).execute()
-		if not returnedRange:
-			raise RangeNotUpdatedError(valueRange)
-	else:
-		raise InvalidInputTypeError(ranges)
-	return returnedRange
+	service.spreadsheets().batchUpdate(spreadsheetId=SpreadsheetId, body=body).execute()
+
+def autoResizeDimensions(service, SpreadsheetId, indexRange):
+	request = []
+	request.append({
+		'autoResizeDimensions': {
+			'dimensions': {
+				'sheetId': 0,
+				'dimension': 'Columns',
+				'startIndex': indexRange[0],
+				'endIndex': indexRange[1],
+			}
+		}
+	})
+	batchUpdate(service, SpreadsheetId, request)
+
+def addSheet(service, SpreadsheetId, sheetName):
+	index = int(getSheets(service,SpreadsheetId)[-1].get('index', 0))
+	request = []
+	request.append({
+		'addSheet': {
+			'properties': {
+				"sheetId": index + 1,
+				"title": sheetName,
+				"index": index + 1,
+				"sheetType": 'GRID',
+				"gridProperties": {
+					"rowCount": 1000,
+					"columnCount": 26,
+					"frozenRowCount": 0,
+					"frozenColumnCount": 0,
+					"hideGridlines": False,
+				},
+				"hidden": False,
+				"tabColor": {
+					"red":   1.0,
+					"green": 1.0,
+					"blue":  1.0,
+					"alpha": 1.0,
+				},
+				"rightToLeft": False,
+			}
+		}
+	})
+	batchUpdate(service, SpreadsheetId, request)
