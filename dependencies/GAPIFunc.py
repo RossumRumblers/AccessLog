@@ -4,6 +4,7 @@
 
 import httplib2shim
 import oauth2client
+import googleapiclient
 
 from oauth2client import tools
 from oauth2client import client
@@ -18,7 +19,7 @@ class NoValueReturnedError(Exception):
 	def __str__(self):
 		return repr(self.value)
 
-class InvalidInputTypeError(Exception): #consider removal
+class InvalidRangeError(Exception):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
@@ -65,36 +66,50 @@ def createAPIService(credentials, discoveryUrl):
 #
 # Request Range via get command
 #
-def requestRange(service, SpreadsheetId, range):
-	returnedRange = service.spreadsheets().values().get(spreadsheetId=SpreadsheetId, range=range).execute()
-	values = returnedRange.get('values', [])
-	if not values:
-		raise NoValueReturnedError(range)
-	else:
-		return values
+def requestRange(service, SpreadsheetId, SheetName, range):
+	a1Note = "{0}!{1}".format(SheetName, range)
+	print(a1Note)
+	try:
+		returnedRange = service.spreadsheets().values().get(spreadsheetId=SpreadsheetId, range=a1Note).execute()
+		values = returnedRange.get('values', [])
+		if not values:
+			raise NoValueReturnedError(a1Note)
+		else:
+			return values
+	except googleapiclient.errors.HttpError as e:
+		raise InvalidRangeError(a1Note)
 
-#
+# 
 # Request Range via batchGet command
 #
-def requestRanges(service, SpreadsheetId, ranges):
+def requestRanges(service, SpreadsheetId, SheetName, ranges):
 	result = []
-	returnedRanges = service.spreadsheets().values().batchGet(spreadsheetId=SpreadsheetId, ranges=ranges).execute()
-	values = returnedRanges.get('valueRanges', [])
-	if not values:
-		raise NoValueReturnedError(ranges)
-	else:
-		for elem in values:
-			result.append(elem.get('values', []))
-		return result
+	a1Notes = []
+	for range in ranges:
+		a1Notes.append(SheetName + "!" + range)
+	try:
+		returnedRanges = service.spreadsheets().values().batchGet(spreadsheetId=SpreadsheetId, ranges=a1Notes).execute()
+		values = returnedRanges.get('valueRanges', [])
+		if not values:
+			raise NoValueReturnedError(a1Notes)
+		else:
+			for elem in values:
+				result.append(elem.get('values', []))
+			return result
+	except googleapiclient.errors.HttpError as e:
+		raise InvalidRangeError(a1Notes)
 
-def updateRange(service, SpreadsheetId, range, sheetData):
+def updateRange(service, SpreadsheetId, SheetName, range, sheetData):
 	requestBody = {'values': sheetData}
-	returnedRange = service.spreadsheets().values().update(spreadsheetId=SpreadsheetId, range=range, body=requestBody, valueInputOption="USER_ENTERED").execute()
+	a1Note = (SheetName + "!" + range)
+	returnedRange = service.spreadsheets().values().update(spreadsheetId=SpreadsheetId, range=a1Note, body=requestBody, valueInputOption="USER_ENTERED").execute()
 	if not returnedRange:
 		raise RangeNotUpdatedError(valueRange)
 	return returnedRange
 
 def getAllSheets(service, SpreadsheetId):
+	'''Get a list of all sheets on the spreadsheet
+	'''
 	sheet_metadata = service.spreadsheets().get(spreadsheetId=SpreadsheetId).execute()
 	sheets = sheet_metadata.get('sheets', '')
 	sheetsArr = []

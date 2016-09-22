@@ -26,3 +26,20 @@ def testInternet():
 		return True
 	except:
 		return False
+
+def getMonthName(num):
+	try:
+		return ['January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December'][num - 1]
+	except(IndexError):
+		return None

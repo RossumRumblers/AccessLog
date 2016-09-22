@@ -44,7 +44,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
 
 	def postSetup(self):
-		self.setWindowFlags(Qt.FramelessWindowHint)
+		#self.setWindowFlags(Qt.FramelessWindowHint)
 		frameGeo = self.frameGeometry()
 		frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
 		self.move(frameGeo.topLeft())
