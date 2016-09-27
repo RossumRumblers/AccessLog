@@ -83,7 +83,6 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 		for radio in self.findChildren(QRadioButton):
 			if(radio.isChecked()):
 				text = radio.text()
-				print(text)
 				return text
 
 	def setSelectedRadio(self, name):
