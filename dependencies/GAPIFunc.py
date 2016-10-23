@@ -31,15 +31,10 @@ class RangeNotUpdatedError(Exception):
 	def __str__(self):
 		return repr(self.value)
 
-#
-# Functions
-#
 
-
-#
-# Retrieve Access Ceredentials
-#
 def getCredentials(CRED_File, Secret_File, Scopes, APPLICATION_NAME, rebuild):
+	'''Retrieve Access Ceredentials
+	'''
 	# Attempt to retreieve credentials from file
 	store = oauth2client.file.Storage(CRED_File)
 	credentials = store.get()
@@ -51,10 +46,9 @@ def getCredentials(CRED_File, Secret_File, Scopes, APPLICATION_NAME, rebuild):
 		print('Storing credentials to ' + CRED_File)
 	return credentials
 
-#
-# Create API Service for acccessing spreadsheets
-#
 def createAPIService(credentials, discoveryUrl):
+	'''Create API Service for acccessing spreadsheets
+	'''
 	http = credentials.authorize(httplib2shim.Http())
 	if not http:
 		return None
@@ -63,10 +57,9 @@ def createAPIService(credentials, discoveryUrl):
 		return None
 	return service
 
-#
-# Request Range via get command
-#
 def requestRange(service, SpreadsheetId, SheetName, range):
+	'''Request Range via get command
+	'''
 	a1Note = "{0}!{1}".format(SheetName, range)
 	print(a1Note)
 	try:
@@ -79,10 +72,9 @@ def requestRange(service, SpreadsheetId, SheetName, range):
 	except googleapiclient.errors.HttpError as e:
 		raise InvalidRangeError(a1Note)
 
-# 
-# Request Range via batchGet command
-#
 def requestRanges(service, SpreadsheetId, SheetName, ranges):
+	'''Request Ranges via batchGet command
+	'''
 	result = []
 	a1Notes = []
 	for range in ranges:
@@ -144,7 +136,7 @@ def autoResizeDimensions(service, SpreadsheetId, indexRange):
 	batchUpdate(service, SpreadsheetId, request)
 
 def addSheet(service, SpreadsheetId, sheetName):
-	index = int(getSheets(service,SpreadsheetId)[-1].get('index', 0))
+	index = int(getAllSheets(service,SpreadsheetId)[-1].get('index', 0))
 	request = []
 	request.append({
 		'addSheet': {

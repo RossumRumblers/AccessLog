@@ -81,6 +81,7 @@ class Reporter(metaclass=Singleton):
 		ClubShortName = JSONReader().getClubNameShort(Club)
 		ClubRosterID = JSONReader().getRosterID(Club)
 		ClubAccessID = JSONReader().getLogID(Club)
+		ClubRosterSheet = JSONReader().getMemberSheet(Club)
 		
 		# get the next available cell for writing
 		try:
@@ -96,12 +97,12 @@ class Reporter(metaclass=Singleton):
 			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), _FirstRowDim, [_FirstRow])
 			self.nextCell = 2
 		except GAPIFunc.InvalidRangeError:
-			GAPIFunc.addSheet(service, SpreadsheetId, getMonthName(self._month))
+			GAPIFunc.addSheet(self._service, ClubAccessID, getMonthName(self._month))
 			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), _FirstRowDim, [_FirstRow])
 			self.nextCell = 2
 
 		# get Searchable List of User ID's
-		IDlist = GAPIFunc.requestRange(self._service, ClubRosterID, _MembersSheetName, _IDColumn)
+		IDlist = GAPIFunc.requestRange(self._service, ClubRosterID, ClubRosterSheet, _IDColumn)
 		print(IDlist)
 
 		# get clocked time of the User
@@ -120,7 +121,7 @@ class Reporter(metaclass=Singleton):
 		
 		if userRow:
 			#get user's info
-			result = GAPIFunc.requestRange(self._service, ClubRosterID, _MembersSheetName, "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow))
+			result = GAPIFunc.requestRange(self._service, ClubRosterID, ClubRosterSheet, "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow))
 
 			# log user to spreadsheet
 			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "B{0}:{0}".format(self.nextCell), result)

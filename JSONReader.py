@@ -36,6 +36,9 @@ class JSONReader(metaclass=Singleton) :
 	
 	def getRosterID(self,clubID):
 		return self.JSONdata['Club-info'][clubID]['Member List']
+		
+	def getMemberSheet(self,clubID):
+		return self.JSONdata['Club-info'][clubID]['Member Sheet']
 
 	def getLogID(self,clubID):
 		return self.JSONdata['Club-info'][clubID]['Log File']
