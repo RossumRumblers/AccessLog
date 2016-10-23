@@ -3,10 +3,11 @@
 #
 
 import os
+import re
 from time import strftime
 from datetime import datetime
-from JSONReader import JSONReader
 from dependencies import GAPIFunc
+from JSONReader import JSONReader
 from dependencies.miscFunc import *
 
 #
@@ -56,6 +57,8 @@ _FirstRow = ["Date: Time",
 # Miscellaneous Declarations
 #
 _dateFormat = "%Y-%m-%d %H:%M:%S"
+_sheetNameRE = '([^-]{3,9})-(\d{4})' # Month-Year
+
 
 # define singleton metclass
 class Singleton(type):
@@ -72,10 +75,9 @@ class Reporter(metaclass=Singleton):
 		self._service = GAPIFunc.createAPIService(GAPIFunc.getCredentials(credFiles[1], credFiles[0],
 									_scopes, _applicationName, False), _discoveryUrl)
 
-	###TODO###
-	# comments
 	def log(self, IDnum, Club):
 		self._month = datetime.today().month
+		self._sheetName = "{0}-{1}".format(getMonthName(self._month), datetime.today().year)
 
 		# get specific information related to club
 		ClubShortName = JSONReader().getClubNameShort(Club)
@@ -85,7 +87,7 @@ class Reporter(metaclass=Singleton):
 		
 		# get the next available cell for writing
 		try:
-			searchList = GAPIFunc.requestRange(self._service, ClubAccessID, getMonthName(self._month), "A2:A")
+			searchList = GAPIFunc.requestRange(self._service, ClubAccessID, self._sheetName, "A2:A")
 			self.nextCell = len(searchList) + 2
 			lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
 			# if the last entry was on a different Day, skip a line
@@ -94,11 +96,11 @@ class Reporter(metaclass=Singleton):
 			
 		except GAPIFunc.NoValueReturnedError:
 			# No Data in spreadhseet, start fresh
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), _FirstRowDim, [_FirstRow])
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, _FirstRowDim, [_FirstRow])
 			self.nextCell = 2
 		except GAPIFunc.InvalidRangeError:
-			GAPIFunc.addSheet(self._service, ClubAccessID, getMonthName(self._month))
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), _FirstRowDim, [_FirstRow])
+			GAPIFunc.addSheet(self._service, ClubAccessID, self._sheetName)
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, _FirstRowDim, [_FirstRow])
 			self.nextCell = 2
 
 		# get Searchable List of User ID's
@@ -124,16 +126,16 @@ class Reporter(metaclass=Singleton):
 			result = GAPIFunc.requestRange(self._service, ClubRosterID, ClubRosterSheet, "{0}{2}:{1}{2}".format(_RrelevantInfo[0], _RrelevantInfo[1], userRow))
 
 			# log user to spreadsheet
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "B{0}:{0}".format(self.nextCell), result)
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "A{0}:A{0}".format(self.nextCell), [[clockedtime]])
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, "B{0}:{0}".format(self.nextCell), result)
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, "A{0}:A{0}".format(self.nextCell), [[clockedtime]])
 			self.nextCell +=1
 			return("{0} User {1} {2} clocked in at {3}".format(ClubShortName, result[0][0], result[0][1], clockedtime))
 			
 		else:
 			# log unregistered user to spreadsheet
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
-			GAPIFunc.updateRange(self._service, ClubAccessID, getMonthName(self._month), "{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, "{0}{1}:{0}{1}".format(_URelevantInfo[0],self.nextCell), [[clockedtime]])
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, "{0}{1}:{0}{1}".format(_URelevantInfo[1],self.nextCell), [[IDnum]])
+			GAPIFunc.updateRange(self._service, ClubAccessID, self._sheetName, "{0}{1}:{0}{1}".format(_URelevantInfo[2],self.nextCell), [["Unregistered"]])
 			self.nextCell +=1
 			return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
 
