@@ -50,4 +50,5 @@ if __name__ == '__main__':
 	print(JSONReader().getClubNameShort(club))
 	print(JSONReader().getClubNameLong(club))
 	print(JSONReader().getRosterID(club))
+	print(JSONReader().getMemberSheet(club))
 	print(JSONReader().getLogID(club))
