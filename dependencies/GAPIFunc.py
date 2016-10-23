@@ -43,7 +43,6 @@ def getCredentials(CRED_File, Secret_File, Scopes, APPLICATION_NAME, rebuild):
 		flow = client.flow_from_clientsecrets(Secret_File, Scopes)
 		flow.user_agent = APPLICATION_NAME
 		credentials = tools.run_flow(flow, store)
-		print('Storing credentials to ' + CRED_File)
 	return credentials
 
 def createAPIService(credentials, discoveryUrl):
@@ -61,7 +60,6 @@ def requestRange(service, SpreadsheetId, SheetName, range):
 	'''Request Range via get command
 	'''
 	a1Note = "{0}!{1}".format(SheetName, range)
-	print(a1Note)
 	try:
 		returnedRange = service.spreadsheets().values().get(spreadsheetId=SpreadsheetId, range=a1Note).execute()
 		values = returnedRange.get('values', [])

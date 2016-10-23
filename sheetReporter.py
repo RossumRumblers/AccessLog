@@ -105,7 +105,6 @@ class Reporter(metaclass=Singleton):
 
 		# get Searchable List of User ID's
 		IDlist = GAPIFunc.requestRange(self._service, ClubRosterID, ClubRosterSheet, _IDColumn)
-		print(IDlist)
 
 		# get clocked time of the User
 		clockedtime = datetime.now().strftime(_dateFormat)
