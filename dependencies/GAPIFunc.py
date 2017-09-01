@@ -1,37 +1,42 @@
-#
-# Functions For simplyifying access to the Google API
-#
+'''
+Functions For simplyifying access to the Google Sheets API
+'''
+
 ###TODO###
 # Notate Parameters
 # Expand Commands
 # Make this a class so I don't need to pass service into every function
 
+import apiclient
 import httplib2shim
 import oauth2client
 import googleapiclient
 
-from oauth2client import tools
-from oauth2client import client
 from oauth2client import service_account
-from apiclient import discovery
 
 #
 # Exception Classes
 #
 class NoValueReturnedError(Exception):
+    '''Thrown when no values are returned'''
     def __init__(self, value):
+        super(NoValueReturnedError, self).__init__(value)
         self.value = value
     def __str__(self):
         return repr(self.value)
 
 class InvalidRangeError(Exception):
+    '''Thrown when the range is invalid'''
     def __init__(self, value):
+        super(InvalidRangeError, self).__init__(value)
         self.value = value
     def __str__(self):
         return repr(self.value)
 
 class RangeNotUpdatedError(Exception):
+    '''Thrown when no the cells in the range are not updated'''
     def __init__(self, value):
+        super(RangeNotUpdatedError, self).__init__(value)
         self.value = value
     def __str__(self):
         return repr(self.value)
@@ -45,11 +50,12 @@ def getOath2Credentials(CRED_File, SECRET_File, Scopes, APPLICATION_NAME, rebuil
     # Attempt to retreieve cached credentials from file
     store = oauth2client.file.Storage(CRED_File)
     credentials = store.get()
+
     if not credentials or credentials.invalid or rebuild:
         # Get Credentials from server using Client Secrets
-        flow = client.flow_from_clientsecrets(SECRET_File, Scopes)
+        flow = oauth2client.client.flow_from_clientsecrets(SECRET_File, Scopes)
         flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store)
+        credentials = oauth2client.tools.run_flow(flow, store)
     return credentials
 
 def getServiceCredentials(SERVICE_File, Scopes):
@@ -58,7 +64,8 @@ def getServiceCredentials(SERVICE_File, Scopes):
     '''
 
     # build credentials object from JSON file
-    return service_account.ServiceAccountCredentials.from_json_keyfile_name(SERVICE_File, Scopes)
+    return service_account.ServiceAccountCredentials.from_json_keyfile_name(
+        SERVICE_File, Scopes)
 
 def createAPIService(credentials, discoveryUrl=None):
     '''
@@ -70,9 +77,9 @@ def createAPIService(credentials, discoveryUrl=None):
 
     if discoveryUrl:
         # distinguishes between Service and Client Secret service Creation
-        service = discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
+        service = apiclient.discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
     else:
-        service = discovery.build('sheets', 'v4', http=http)
+        service = apiclient.discovery.build('sheets', 'v4', http=http)
     if not service:
         return None
     return service

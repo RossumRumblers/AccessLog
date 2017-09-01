@@ -1,8 +1,10 @@
-#
-# Version 2.0.1B
-#
+#!/usr/bin/python3
+'''
+Main GUI file
 
-import re
+Version 2.2.1B
+'''
+
 import sys
 import worker
 import mainWindow
@@ -14,88 +16,115 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWin
 
 
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
+    '''
+    Main Gui Form Class
+    '''
 
-	def __init__(self, parent=None):
-		if not testRoot():
-			print("Please rerun this script with root.")
-			sys.exit()
-		if not testInternet():
-			print("Please Verify this machine is connected to the internet.")
-			sys.exit()
-		QMainWindow.__init__(self)
-		self.setupUi(self)
-		self.postSetup()
-		sheetReporter.Reporter() # init Google API
+    def __init__(self):
+        if not testRoot():
+            print("Please rerun this script with root.")
+            sys.exit()
+        if not testInternet():
+            print("Please Verify this machine is connected to the internet.")
+            sys.exit()
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+        self.postSetup()
+        sheetReporter.Reporter() # init Google API
 
-		#
-		# worker thread code from http://stackoverflow.com/a/33453124
-		#
-		self.workerobj = worker.Worker(self)                    # instatiate worker object
-		self.wThread = QThread()                                # instatiate worker thread
-		self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
-		self.workerobj._updateStatus.connect(self.updateStatus) # connect the update emitter to the onUpdate function
-		self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
-		self.wThread.start()                                    # start the worker thread
+        #
+        # worker thread code from http://stackoverflow.com/a/33453124
+        #
+        self.workerobj = worker.Worker(self)                    # instatiate worker object
+        self.wThread = QThread()                                # instatiate worker thread
+        self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
+        self.workerobj._updateStatus.connect(self.updateStatus) # connect the update emitter to the onUpdate function
+        self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
+        self.wThread.start()                                    # start the worker thread
 
-		self.lineEdit.returnPressed.connect(self.pushButton.click)
-		self.pushButton.clicked.connect(self.buttonPushed)
+        #attach button/keyboard key listeners
+        self.lineEdit.returnPressed.connect(self.pushButton.click)
+        self.pushButton.clicked.connect(self.buttonPushed)
 
-		self.show()
+        #show the window
+        self.show()
 
 
-	def postSetup(self):
-		self.setWindowFlags(Qt.FramelessWindowHint)
-		frameGeo = self.frameGeometry()
-		frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
-		self.move(frameGeo.topLeft())
-		i = 0
-		for radio in self.findChildren(QRadioButton):
-			try:
-				elem = JSONReader.JSONReader().getClubNameLong(JSONReader.JSONReader().getClubList()[i])
-				radio.setText(elem)
-			except(IndexError):
-				radio.hide()
-			i+=1
+    def postSetup(self):
+        '''
+        Function to be executed after window creation
+        '''
 
-	def W_onFinished(self):
-		self.wThread.quit()
-		self.obj.USBworkerfinish()
+        #Comment out this line to give the window a frame (and thus, a close button)
+        #self.setWindowFlags(Qt.FramelessWindowHint)
+        #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	def buttonPushed(self):
-		IDnum = self.lineEdit.text()
-		if(IDnum == ""):
-			self.updateStatus("Please Enter an ASU ID", 3)
-		else:
-			self.updateStatus("Logging...", 0)
-			self.lineEdit.setText("")
-			if len(IDnum) == 10 and IDnum.isdigit():
-				clubName = self.getSelectedRadio()
-				self.setSelectedRadio(clubName)
-				clubID = None
-				for club in JSONReader.JSONReader().getClubList():
-					if(JSONReader.JSONReader().getClubNameLong(club) == clubName):
-						clubID = club
-				self.updateStatus(sheetReporter.Reporter().log(IDnum, clubID), 3)
-			else:
-				self.updateStatus("Please Enter an ASU ID", 3)
+        frameGeo = self.frameGeometry()
+        frameGeo.moveCenter(QDesktopWidget().availableGeometry().center())
+        self.move(frameGeo.topLeft())
+        # attempt to center the window on screen
 
-	def getSelectedRadio(self):
-		for radio in self.findChildren(QRadioButton):
-			if(radio.isChecked()):
-				text = radio.text()
-				return text
+        i = 0
+        for radio in self.findChildren(QRadioButton):
+            #dynamically populate club radio-button list
+            try:
+                elem = JSONReader.JSONReader().getClubNameLong(JSONReader.JSONReader().getClubList()[i])
+                radio.setText(elem)
+            except(IndexError):
+                radio.hide()
+            i+=1
 
-	def setSelectedRadio(self, name):
-		for radio in self.findChildren(QRadioButton):
-			if name == radio.text():
-				radio.setChecked(True)
+    def W_onFinished(self):
+        '''
+        Worker thread cleanup function
+        '''
+        self.wThread.quit()
+        self.obj.USBworkerfinish()
 
-	def updateStatus(self, message, time):
-		'''time is in seconds'''
-		self.statusBar.showMessage(message, time*1000)
+    def buttonPushed(self):
+        '''
+        Function to execute when the submit button or return key is pushed
+        '''
+
+        IDnum = self.lineEdit.text()
+        if IDnum == "":
+            self.updateStatus("Please Enter an ASU ID", 3)
+        else:
+            self.updateStatus("Logging...", 0)
+            self.lineEdit.setText("")
+            if len(IDnum) == 10 and IDnum.isdigit():
+                clubName = self.getSelectedRadio()
+                self.setSelectedRadio(clubName)
+                clubID = None
+                for club in JSONReader.JSONReader().getClubList():
+                    if JSONReader.JSONReader().getClubNameLong(club) == clubName:
+                        clubID = club
+                self.updateStatus(sheetReporter.Reporter().log(IDnum, clubID), 3)
+            else:
+                self.updateStatus("Please Enter an ASU ID", 3)
+
+    def getSelectedRadio(self):
+        '''get Selected Radio Button'''
+        for radio in self.findChildren(QRadioButton):
+            if radio.isChecked():
+                return radio.text()
+
+    def setSelectedRadio(self, name):
+        '''set Selected Radio Button'''
+        for radio in self.findChildren(QRadioButton):
+            if name == radio.text():
+                radio.setChecked(True)
+
+    def updateStatus(self, message, time):
+        '''
+        Update the status bar in the window
+
+        time is in seconds
+        '''
+        self.statusBar.showMessage(message, time*1000)
 
 if __name__ == '__main__':
-	app = QApplication(sys.argv)
-	form = Form()
-	app.exec_()
-	sys.exit()
+    app = QApplication(sys.argv)
+    Form()
+    app.exec_()
+    sys.exit()

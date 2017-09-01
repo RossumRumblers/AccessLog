@@ -62,7 +62,6 @@ _FirstRow = ["Date: Time",
 # Miscellaneous Declarations
 #
 _dateFormat = "%Y-%m-%d %H:%M:%S"
-_sheetNameRE = '([^-]{3,9})-(\d{4})' # Month-Year
 
 
 # define singleton metclass
@@ -96,8 +95,9 @@ class Reporter(metaclass=Singleton):
         try:
             searchList = GAPIFunc.requestRange(self._service, ClubAccessID, self._sheetName, "A2:A")
             self.nextCell = len(searchList) + 2
-            lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
+
             # if the last entry was on a different Day, skip a line
+            lastDate = datetime.strptime(searchList[-1][0], _dateFormat)
             if datetime.today().day != lastDate.day:
                 self.nextCell += 1
 
@@ -112,6 +112,7 @@ class Reporter(metaclass=Singleton):
 
             self.nextCell = 2
         except GAPIFunc.InvalidRangeError:
+            #sheet doesn't exist, create it and populate it
             GAPIFunc.addSheet(self._service, ClubAccessID, self._sheetName)
             GAPIFunc.updateRange(
                 self._service,
@@ -119,7 +120,7 @@ class Reporter(metaclass=Singleton):
                 self._sheetName,
                 _FirstRowDim,
                 [_FirstRow])
-
+        finally:
             self.nextCell = 2
 
         # get Searchable List of User ID's
@@ -145,32 +146,36 @@ class Reporter(metaclass=Singleton):
                 self._service,
                 ClubRosterID,
                 ClubRosterSheet,
-                "{0}{2}:{2}".format(
+                "{0}{2}:{1}{2}".format(
                     _relevantInfo[0],
+                    _relevantInfo[1],
                     userRow))
 
             # log user to spreadsheet
-            GAPIFunc.updateRange(self._service,
-            ClubAccessID,
-            self._sheetName,
-            "{0}{2}:{1}{2}".format(
-                _timeColumn,
-                _relevantInfo[1],
-                self.nextCell),
-            [[clockedtime] + result])
+            GAPIFunc.updateRange(
+                self._service,
+                ClubAccessID,
+                self._sheetName,
+                "{0}{2}:{1}{2}".format(
+                    _timeColumn,
+                    _relevantInfo[1],
+                    self.nextCell),
+                [[clockedtime] + result[0]])
 
             return("{0} User {1} {2} clocked in at {3}".format(ClubShortName, result[0][0], result[0][1], clockedtime))
 
         else:
             # log unregistered user to spreadsheet
-            GAPIFunc.updateRange(self._service,
-            ClubAccessID,
-            self._sheetName,
-            "{0}{2}:{1}{2}".format(
-                _timeColumn,
-                _relevantInfo[1],
-                self.nextCell),
-            [[clockedtime, 'Unregistered', '', IDnum]])
+            GAPIFunc.updateRange(
+                self._service,
+                ClubAccessID,
+                self._sheetName,
+                "{0}{2}:{1}{2}".format(
+                    _timeColumn,
+                    _relevantInfo[1],
+                    self.nextCell),
+                [[clockedtime, 'Unregistered', '', IDnum]])
+
             self.nextCell +=1
             return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
 

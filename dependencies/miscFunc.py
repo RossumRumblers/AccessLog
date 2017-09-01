@@ -10,42 +10,26 @@ import subprocess
 # 
 #
 def testRoot():
-	'''Test Root Access
-	'''
-	p = subprocess.Popen('sudo -n echo', shell=True, stdout=subprocess.PIPE,
-					stderr=subprocess.STDOUT, universal_newlines=True)
-	retval = (p.stdout.readlines()[0].find("sudo: a password is required") == -1)
-	wait = p.wait()
-	return retval
+    '''
+    Test Root Access
+    '''
 
-#
-# 
-#
+    #run a simple command as root and check if we need a password
+    p = subprocess.Popen('sudo -n echo', shell=True, stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT, universal_newlines=True)
+    retval = (p.stdout.readlines()[0].find("sudo: a password is required") == -1)
+    p.wait()
+    return retval
+
 def testInternet():
-	'''Check Internet Connection
-	'''
-	conn = httplib2.HTTPConnectionWithTimeout("www.google.com",timeout=None)
-	try:
-		conn.request("HEAD", "/")
-		return True
-	except:
-		return False
+    '''
+    Check Internet Connection
+    '''
 
-def getMonthName(num):
-	'''Get Month Name by number
-	'''
-	try:
-		return ['January',
-			'February',
-			'March',
-			'April',
-			'May',
-			'June',
-			'July',
-			'August',
-			'September',
-			'October',
-			'November',
-			'December'][num - 1]
-	except(IndexError):
-		return None
+    # attempt a connection to google and report success or not
+    conn = httplib2.HTTPConnectionWithTimeout("www.google.com", timeout=None)
+    try:
+        conn.request("HEAD", "/")
+        return True
+    except:
+        return False
