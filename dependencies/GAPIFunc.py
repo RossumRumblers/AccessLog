@@ -82,7 +82,7 @@ def requestRange(service, SpreadsheetId, SheetName, req_range):
     Request Range via get command
     '''
 
-    a1Not = "{0}!{1}".format(SheetName, req_range)
+    a1Not = "'{0}'!{1}".format(SheetName, req_range)
 
     try:
         spreadServ = service.spreadsheets().values()
@@ -102,7 +102,7 @@ def requestRanges(service, SpreadsheetId, SheetName, ranges):
     result = []
     a1Notes = []
     for req_range in ranges:
-        a1Notes.append(SheetName + "!" + req_range)
+        a1Notes.append("'{0}'!{1}".format(SheetName, req_range))
     try:
         spreadServ = service.spreadsheets().values()
         returnedRanges = spreadServ.batchGet(spreadsheetId=SpreadsheetId, ranges=a1Notes).execute()
@@ -121,7 +121,7 @@ def updateRange(service, SpreadsheetId, SheetName, req_range, sheetData):
     Update
     '''
     requestBody = {'values': sheetData}
-    a1Note = (SheetName + "!" + req_range)
+    a1Note = "'{0}'!{1}".format(SheetName, req_range)
 
     spreadServ = service.spreadsheets().values()
     returnedRange = spreadServ.update(
