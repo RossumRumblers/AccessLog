@@ -9,9 +9,9 @@ Functions For simplyifying access to the Google Sheets API
 
 import apiclient
 import httplib2shim
-import oauth2client
 import googleapiclient
 
+import oauth2client
 from oauth2client import service_account
 
 #
@@ -77,7 +77,11 @@ def createAPIService(credentials, discoveryUrl=None):
 
     if discoveryUrl:
         # distinguishes between Service and Client Secret service Creation
-        service = apiclient.discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
+        service = apiclient.discovery.build(
+            'sheets',
+            'v4',
+            http=http,
+            discoveryServiceUrl=discoveryUrl)
     else:
         service = apiclient.discovery.build('sheets', 'v4', http=http)
     if not service:
@@ -99,7 +103,7 @@ def requestRange(service, SpreadsheetId, SheetName, req_range):
             raise NoValueReturnedError(a1Not)
         else:
             return values
-    except googleapiclient.errors.HttpError as e:
+    except googleapiclient.errors.HttpError:
         raise InvalidRangeError(a1Not)
 
 def requestRanges(service, SpreadsheetId, SheetName, ranges):
@@ -120,7 +124,7 @@ def requestRanges(service, SpreadsheetId, SheetName, ranges):
             for elem in values:
                 result.append(elem.get('values', []))
             return result
-    except googleapiclient.errors.HttpError as e:
+    except googleapiclient.errors.HttpError:
         raise InvalidRangeError(a1Notes)
 
 def updateRange(service, SpreadsheetId, SheetName, req_range, sheetData):

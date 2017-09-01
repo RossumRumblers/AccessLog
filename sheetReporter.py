@@ -3,12 +3,12 @@
 #
 
 import os
-import re
-from time import strftime
+
 from datetime import datetime
-from dependencies import GAPIFunc
 from JSONReader import JSONReader
-from dependencies.miscFunc import *
+
+from dependencies import GAPIFunc
+from dependencies.miscFunc import Singleton
 
 #
 # Google Spreadsheet Declarations
@@ -63,21 +63,18 @@ _FirstRow = ["Date: Time",
 #
 _dateFormat = "%Y-%m-%d %H:%M:%S"
 
-
-# define singleton metclass
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-#define usage class for sheetreporter
 class Reporter(metaclass=Singleton):
+    '''
+    Usage class for sheetreporter
+    '''
     def __init__(self):
         serviceFile = _fileSetup()
         self._service = GAPIFunc.createAPIService(
             GAPIFunc.getServiceCredentials(serviceFile, _scopes))
+
+        #to silence pylint:
+        self._sheetName = None
+        self.nextCell = None
 
     def log(self, IDnum, Club):
         '''
@@ -139,7 +136,7 @@ class Reporter(metaclass=Singleton):
             if IDlist[cell][0] == IDnum:
                 userRow = cell + _IDColumnOffset
                 break
-
+        retval = None
         if userRow:
             #get user's info
             result = GAPIFunc.requestRange(
@@ -162,8 +159,11 @@ class Reporter(metaclass=Singleton):
                     self.nextCell),
                 [[clockedtime] + result[0]])
 
-            return("{0} User {1} {2} clocked in at {3}".format(ClubShortName, result[0][0], result[0][1], clockedtime))
-
+            retval = "{0} User {1} {2} clocked in at {3}".format(
+                ClubShortName,
+                result[0][0],
+                result[0][1],
+                clockedtime)
         else:
             # log unregistered user to spreadsheet
             GAPIFunc.updateRange(
@@ -176,8 +176,10 @@ class Reporter(metaclass=Singleton):
                     self.nextCell),
                 [[clockedtime, 'Unregistered', '', IDnum]])
 
-            self.nextCell +=1
-            return("Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime))
+            self.nextCell += 1
+            retval = "Unregistered user {0} clocked in at {1}".format(IDnum, clockedtime)
+
+        return retval
 
 #just in case
 if __name__ == '__main__':

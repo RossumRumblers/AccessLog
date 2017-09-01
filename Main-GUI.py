@@ -8,11 +8,12 @@ Version 2.2.1B
 import sys
 import worker
 import mainWindow
-import JSONReader
 import sheetReporter
-from dependencies.miscFunc import *
-from PyQt5.QtCore import QThread, Qt
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QMainWindow, QDesktopWidget, QRadioButton
+
+from dependencies import miscFunc
+from JSONReader import JSONReader
+from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QRadioButton
 
 
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
@@ -21,10 +22,10 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
     '''
 
     def __init__(self):
-        if not testRoot():
+        if not miscFunc.testRoot():
             print("Please rerun this script with root.")
             sys.exit()
-        if not testInternet():
+        if not miscFunc.testInternet():
             print("Please Verify this machine is connected to the internet.")
             sys.exit()
         QMainWindow.__init__(self)
@@ -38,7 +39,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         self.workerobj = worker.Worker(self)                    # instatiate worker object
         self.wThread = QThread()                                # instatiate worker thread
         self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
-        self.workerobj._updateStatus.connect(self.updateStatus) # connect the update emitter to the onUpdate function
+        self.workerobj.updateStatus.connect(self.updateStatus)  # connect the update emitter to the onUpdate function
         self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
         self.wThread.start()                                    # start the worker thread
 
@@ -68,9 +69,9 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         for radio in self.findChildren(QRadioButton):
             #dynamically populate club radio-button list
             try:
-                elem = JSONReader.JSONReader().getClubNameLong(JSONReader.JSONReader().getClubList()[i])
+                elem = JSONReader().getClubNameLong(JSONReader().getClubList()[i])
                 radio.setText(elem)
-            except(IndexError):
+            except IndexError:
                 radio.hide()
             i+=1
 

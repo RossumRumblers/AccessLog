@@ -1,15 +1,16 @@
-import time
-import evdev
-import mainWindow
-import JSONReader
+'''
+USB Scanner Worker Thread Object Module
+'''
+
 import sheetReporter
-from dependencies.USBFunc import *
-from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot
+from dependencies import USBFunc
+from JSONReader import JSONReader
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 #regular expression for identifying ASU Student ID's
-IDregex = ";601744(\d{10})\d(\d{10})\?"
+IDregex = r";601744(\d{10})\d(\d{10})\?"
 # hardware ID's for the Scanner
-device_IDs = ["5131","2007"]
+device_IDs = ["5131", "2007"]
 
 
 #
@@ -21,7 +22,7 @@ class Worker(QObject):
 
     # create signal emitters
     _finished = pyqtSignal()
-    _updateStatus = pyqtSignal(str,int)
+    updateStatus = pyqtSignal(str, int)
 
     # declare objects
     _readerDevice = None
@@ -30,27 +31,27 @@ class Worker(QObject):
     def __init__(self, mainWindow):
         QObject.__init__(self)
         self._mainWindow = mainWindow
-        self._readerDevice = initReader(device_IDs[0], device_IDs[1])
+        self._readerDevice = USBFunc.initReader(device_IDs[0], device_IDs[1])
 
     @pyqtSlot()
     def USBworker(self):
         try:
             self._readerDevice.grab()
-        except AttributeError as e:
+        except AttributeError:
             self._finished.emit()
             return
 
-        while(True):
+        while True:
             # retrieve data from card scanner
             # this command will hold execution until data is returned from the  card reader
-            IDdata = interpretEvents(readData(self._readerDevice))
-            self._updateStatus.emit("Logging...", 0)
+            IDdata = USBFunc.interpretEvents(USBFunc.readData(self._readerDevice))
+            self.updateStatus.emit("Logging...", 0)
 
             # get ID from regex
-            IDnum = extractID(IDdata, IDregex)
+            IDnum = USBFunc.extractID(IDdata, IDregex)
             if not IDnum:
                 # ID was not returned, possibly not ASU ID.
-                self._updateStatus.emit("Please Scan only an ASU ID.", 3)
+                self.updateStatus.emit("Please Scan only an ASU ID.", 3)
             else:
                 # get club Identifier from the Name on the RadioButton
                 clubName = self._mainWindow.getSelectedRadio()
@@ -58,13 +59,13 @@ class Worker(QObject):
 
                 # get Long Club Name
                 clubID = None
-                for club in JSONReader.JSONReader().getClubList():
-                    if(JSONReader.JSONReader().getClubNameLong(club) == clubName):
+                for club in JSONReader().getClubList():
+                    if JSONReader().getClubNameLong(club) == clubName:
                         clubID = club
                         break
 
                 # report ID and return update
-                self._updateStatus.emit(sheetReporter.Reporter().log(IDnum, clubID), 3)
+                self.updateStatus.emit(sheetReporter.Reporter().log(IDnum, clubID), 3)
 
             # ensure the ID isnt double logged
             IDnum = None
@@ -76,5 +77,5 @@ class Worker(QObject):
     def USBworkerfinish(self):
         try:
             self._readerDevice.grab()
-        except AttributeError as e:
+        except AttributeError:
             return
