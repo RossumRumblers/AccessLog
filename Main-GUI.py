@@ -54,7 +54,6 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
         #show the window
         self.show()
-        self.Alert('indkfjgnfo', 'test')
 
 
     def postSetup(self):
@@ -63,7 +62,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         '''
 
         #Comment out this line to give the window a frame (and thus, a close button)
-        #self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint)
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         frameGeo = self.frameGeometry()
@@ -129,13 +128,13 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         '''
         if mb_type == 'info':
             # Information
-            QMessageBox.information(self, 'Information', mb_message).exec()
+            QMessageBox.information(self, 'Information', mb_message)
         elif mb_type == 'warn':
             # Warning
-            QMessageBox.warning(self, 'Warning', mb_message).exec()
+            QMessageBox.warning(self, 'Warning', mb_message)
         elif mb_type == 'crit':
             # Critical
-            QMessageBox.critical(self, 'Severe Error', mb_message).exec()
+            QMessageBox.critical(self, 'Severe Error', mb_message)
         else:
             # Error throwing Error. Oh God...
             QMessageBox.critical(self, 'Error', 'Error displaying Error.\nNow is the time to panic.').exec()
