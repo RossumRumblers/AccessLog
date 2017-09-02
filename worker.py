@@ -3,6 +3,7 @@ USB Scanner Worker Thread Object Module
 '''
 
 import sheetReporter
+
 from dependencies import USBFunc
 from JSONReader import JSONReader
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
@@ -17,12 +18,14 @@ device_IDs = ["5131", "2007"]
 # some code from http://stackoverflow.com/a/33453124
 #
 class Worker(QObject):
-# Creates a worker thread for interfacing with the device reader independently
-# of the GUI.
+    '''
+    Creates a worker thread for interfacing with the device reader independently of the GUI.
+    '''
 
     # create signal emitters
     _finished = pyqtSignal()
     updateStatus = pyqtSignal(str, int)
+    Alert = pyqtSignal(str, str)
 
     # declare objects
     _readerDevice = None
@@ -31,24 +34,33 @@ class Worker(QObject):
     def __init__(self, mainWindow):
         QObject.__init__(self)
         self._mainWindow = mainWindow
-        self._readerDevice = USBFunc.initReader(device_IDs[0], device_IDs[1])
+        self._readerDevice = None
 
     @pyqtSlot()
     def USBworker(self):
+        '''
+        Worker Thread function
+        '''
         try:
-            self._readerDevice.grab()
-        except AttributeError:
+            self._readerDevice = USBFunc.Reader(device_IDs[0], device_IDs[1])
+            self._readerDevice.grabDevice()
+        except USBFunc.Reader.InitError as e:
+            self.Alert.emit('crit', e.message)
             self._finished.emit()
             return
 
         while True:
             # retrieve data from card scanner
             # this command will hold execution until data is returned from the  card reader
-            IDdata = USBFunc.interpretEvents(USBFunc.readData(self._readerDevice))
+            keyEvents = self._readerDevice.readData()
+            try:
+                IDdata = self._readerDevice.interpretEvents(keyEvents)
+            except KeyError as e:
+                self.Alert.emit('warn', e.message)
             self.updateStatus.emit("Logging...", 0)
 
             # get ID from regex
-            IDnum = USBFunc.extractID(IDdata, IDregex)
+            IDnum = self._readerDevice.extractID(IDdata, IDregex)
             if not IDnum:
                 # ID was not returned, possibly not ASU ID.
                 self.updateStatus.emit("Please Scan only an ASU ID.", 3)
@@ -64,8 +76,19 @@ class Worker(QObject):
                         clubID = club
                         break
 
-                # report ID and return update
-                self.updateStatus.emit(sheetReporter.Reporter().log(IDnum, clubID), 3)
+                if not JSONReader().getClubAllowed(clubID):
+                    # members of this clube are not allowed to sign in
+                    self.Alert.emit('crit', 'This club is currently not allowed to register.\n\
+                        Please see John Alden or your club officers about this.')
+                else:
+                    # report ID and return update
+                    try:
+                        self.updateStatus.emit(sheetReporter.Reporter().log(IDnum, clubID), 3)
+                    except Exception as e:
+                        # Theres like...a ton of things that can go wrong here...
+                        # Until i can figure them all just throw all errors
+                        self.Alert.emit('crit', e.message)
+                        self.updateStatus.emit('Nothing logged due to Error', 3)
 
             # ensure the ID isnt double logged
             IDnum = None
@@ -76,6 +99,6 @@ class Worker(QObject):
 
     def USBworkerfinish(self):
         try:
-            self._readerDevice.grab()
-        except AttributeError:
-            return
+            self._readerDevice.ungrabDevice()
+        except USBFunc.Reader.InitError as e:
+            self.Alert.emit('crit', e.message)

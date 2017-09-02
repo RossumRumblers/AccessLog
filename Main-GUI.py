@@ -13,7 +13,7 @@ import sheetReporter
 from dependencies import miscFunc
 from JSONReader import JSONReader
 from PyQt5.QtCore import QThread
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QRadioButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QRadioButton, QMessageBox
 
 
 class Form(QMainWindow, mainWindow.Ui_MainWindow):
@@ -38,8 +38,13 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         #
         self.workerobj = worker.Worker(self)                    # instatiate worker object
         self.wThread = QThread()                                # instatiate worker thread
+
         self.workerobj.moveToThread(self.wThread)               # move the worker object into the worker thread
-        self.workerobj.updateStatus.connect(self.updateStatus)  # connect the update emitter to the onUpdate function
+
+        #emitters enable inter-thread function calls
+        self.workerobj.updateStatus.connect(self.updateStatus)  # connect the updateStatus emitter to the updateStatus function
+        self.workerobj.Alert.connect(self.Alert)                # do the same for alert
+
         self.wThread.started.connect(self.workerobj.USBworker)  # on thread started: run the USBworker function
         self.wThread.start()                                    # start the worker thread
 
@@ -49,6 +54,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
 
         #show the window
         self.show()
+        self.Alert('indkfjgnfo', 'test')
 
 
     def postSetup(self):
@@ -73,7 +79,7 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
                 radio.setText(elem)
             except IndexError:
                 radio.hide()
-            i+=1
+            i += 1
 
     def W_onFinished(self):
         '''
@@ -97,8 +103,8 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
                 clubName = self.getSelectedRadio()
                 self.setSelectedRadio(clubName)
                 clubID = None
-                for club in JSONReader.JSONReader().getClubList():
-                    if JSONReader.JSONReader().getClubNameLong(club) == clubName:
+                for club in JSONReader().getClubList():
+                    if JSONReader().getClubNameLong(club) == clubName:
                         clubID = club
                 self.updateStatus(sheetReporter.Reporter().log(IDnum, clubID), 3)
             else:
@@ -115,6 +121,24 @@ class Form(QMainWindow, mainWindow.Ui_MainWindow):
         for radio in self.findChildren(QRadioButton):
             if name == radio.text():
                 radio.setChecked(True)
+
+    def Alert(self, mb_type, mb_message):
+        '''Opens messageBox
+
+        type is 'info', 'warn', or 'crit'
+        '''
+        if mb_type == 'info':
+            # Information
+            QMessageBox.information(self, 'Information', mb_message).exec()
+        elif mb_type == 'warn':
+            # Warning
+            QMessageBox.warning(self, 'Warning', mb_message).exec()
+        elif mb_type == 'crit':
+            # Critical
+            QMessageBox.critical(self, 'Severe Error', mb_message).exec()
+        else:
+            # Error throwing Error. Oh God...
+            QMessageBox.critical(self, 'Error', 'Error displaying Error.\nNow is the time to panic.').exec()
 
     def updateStatus(self, message, time):
         '''
