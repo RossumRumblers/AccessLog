@@ -8,7 +8,15 @@ import evdev
 class Reader:
     class InitError(Exception):
         """
-        Exception raised for deviceInitproblems
+        Exception raised for deviceInit problems
+        """
+
+        def __init__(self, message):
+            self.message = message
+
+    class ReaderError(Exception):
+        """
+        Exception raised for Card Reader Issues
         """
 
         def __init__(self, message):
@@ -43,7 +51,7 @@ class Reader:
             self.reader.grab()
         else:
             raise self.InitError('Cannot Grab, no device initialized.')
-    
+
     def ungrabDevice(self):
         '''
         Ungrab USB Device
@@ -84,7 +92,6 @@ class Reader:
 
         for event in keyEvents:
         #iterate through keyEvent List
-
             if modifier:
                 # Modifier is used to indicate special character typing.
                 # As we must interpret keyEvents, if you want to type a percent sign '%'
@@ -98,8 +105,8 @@ class Reader:
                 elif event.keycode == "KEY_EQUAL":
                     resultString += "+"
                 else:
-                    #I don't think it means keyboard key...but I also don't care
-                    raise KeyError("Undefined Key: " + event.keycode)
+                    raise self.ReaderError("Undefined Key: " + event.keycode)
+                modifier = False
             else:
                 # I think the card reader only uses left shift but just in case, check both
                 if event.keycode == "KEY_LEFTSHIFT" or event.keycode == "KEY_RIGHTSHIFT":
@@ -112,7 +119,7 @@ class Reader:
                     if str.isalnum(event.keycode[-1]):
                         resultString += event.keycode[-1]
                     else:
-                        raise KeyError("Undefined Key: " + event.keycode)
+                        raise self.ReaderError("Undefined Key: " + event.keycode)
                 elif event.keycode == "KEY_SEMICOLON":
                     resultString += ";"
                 elif event.keycode == "KEY_SPACE":
@@ -120,7 +127,7 @@ class Reader:
                 elif event.keycode == "KEY_EQUAL":
                     resultString += "="
                 else:
-                    raise KeyError("Undefined Key: " + event.keycode)
+                    raise self.ReaderError("Undefined Key: " + event.keycode)
         return resultString
 
     def extractID(self, data, regex):
