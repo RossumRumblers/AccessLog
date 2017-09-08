@@ -31,8 +31,7 @@ def _fileSetup():
     '''
     folderPath = os.path.join(os.path.expanduser('~'), _Folder)
     _SERVICE_File = os.path.join(folderPath, _SERVICE_FileName)
-    #return _SERVICE_File
-    return 'secrets/serviceCred.json'
+    return _SERVICE_File
 
 #
 # Column Declarations
