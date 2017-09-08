@@ -2,7 +2,7 @@
 '''
 Main GUI file
 
-Version 2.2.1B
+Version 2.2.2
 '''
 
 import sys
@@ -12,7 +12,7 @@ import sheetReporter
 
 from dependencies import miscFunc
 from JSONReader import JSONReader
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QRadioButton, QMessageBox
 
 
