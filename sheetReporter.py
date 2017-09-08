@@ -32,6 +32,7 @@ def _fileSetup():
     folderPath = os.path.join(os.path.expanduser('~'), _Folder)
     _SERVICE_File = os.path.join(folderPath, _SERVICE_FileName)
     return _SERVICE_File
+    #return 'secrets/serviceCred.json'
 
 #
 # Column Declarations
@@ -163,6 +164,18 @@ class Reporter(metaclass=Singleton):
                 result[0][0],
                 result[0][1],
                 clockedtime)
+
+            if JSONReader().getLastLoginEnabled(Club):
+                GAPIFunc.updateRange(
+                    self._service,
+                    ClubRosterID,
+                    ClubRosterSheet,
+                    "{0}{1}".format(
+                        JSONReader().getLastLoginColumn(Club),
+                        userRow
+                    ),
+                    [[clockedtime]]
+                )
         else:
             # log unregistered user to spreadsheet
             GAPIFunc.updateRange(

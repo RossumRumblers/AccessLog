@@ -42,6 +42,12 @@ class JSONReader(metaclass=Singleton):
     def getLogID(self, clubID):
         return self.JSONdata['Club-info'][clubID]['Log File']
 
+    def getLastLoginEnabled(self, clubID):
+        return self.JSONdata['Club-info'][clubID]['LastLogin Column']
+
+    def getLastLoginColumn(self, clubID):
+        return self.JSONdata['Club-info'][clubID]['LastLogin Column']
+
     def getClubAllowed(self, clubID):
         return self.JSONdata['Club-info'][clubID]['Allow']
 
