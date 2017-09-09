@@ -78,8 +78,8 @@ class Worker(QObject):
 
                 if not JSONReader().getClubAllowed(clubID):
                     # members of this clube are not allowed to sign in
-                    self.Alert.emit('crit', 'This club is currently not allowed to register.\n" +\
-                        "Please see John Alden or your club officers about this.')
+                    self.Alert.emit('crit', "This club is currently not allowed to register.\n" +
+                        "Please see John Alden or your club officers about this.")
 
                     # clear "Logging..." from the bottom of the window
                     self.updateStatus.emit('', 0)
