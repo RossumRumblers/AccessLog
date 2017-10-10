@@ -99,7 +99,7 @@ class Reporter(metaclass=Singleton):
                 self.nextCell += 1
 
         except GAPIFunc.NoValueReturnedError:
-            # No Data in sheet, start fresh
+            # No Data in sheet, start fresh, add headers
             GAPIFunc.updateRange(
                 self._service,
                 ClubAccessID,
@@ -117,8 +117,6 @@ class Reporter(metaclass=Singleton):
                 self._sheetName,
                 _FirstRowDim,
                 [_FirstRow])
-        finally:
-            self.nextCell = 2
 
         # get Searchable List of User ID's
         IDlist = GAPIFunc.requestRange(self._service, ClubRosterID, ClubRosterSheet, _IDColumn)
